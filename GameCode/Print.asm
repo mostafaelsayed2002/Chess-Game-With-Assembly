@@ -6,8 +6,8 @@ PUBLIC Print
 .STACK 64
 .DATA 
 
-imgWidth  EQU 96
-imgHeight EQU 96
+imgWidth  EQU 75
+imgHeight EQU 75
 imgFilehandle DW ?
 imgData DB imgWidth*imgHeight dup(0) ; EVERY ELEMNT IS 96*96PIXAL
 
@@ -16,11 +16,14 @@ imgData DB imgWidth*imgHeight dup(0) ; EVERY ELEMNT IS 96*96PIXAL
 Print PROC FAR 
 
   MOV AX , @DATA
-    MOV DS , AX
+  MOV DS , AX
+
+
+
 
 ;//////////////
 mov AX,4F02h ;/
-mov BX,105h  ;/  graph 1024x768  256 colors
+mov BX,103h  ;/  graph 800*600  256 colors
 INT 10h      ;/
 ;//////////////
 
@@ -29,11 +32,56 @@ INT 10h      ;/
 	
     LEA BX , imgData ; BL contains index at the current drawn pixel
 	
-    MOV CX,0
-    MOV DX,0
+    MOV CX,0   ;COL 
+    MOV DX,0    ;ROW
     MOV AH,0ch
 	
+
+
 ; Drawing loop
+
+   CMP imgFilename[0],'w' ;;WHITE
+    JNE DRAWBLACK
+    drawLoopW:
+    MOV AL,[BX]
+    CMP AL,00H
+    JE NODRAWB
+    INT 10h 
+    NODRAWB:
+    INC CX
+    INC BX
+    CMP CX,imgWidth
+    JNE drawLoopW 
+	
+    MOV CX , 0
+    INC DX
+    CMP DX , imgHeight
+    JNE drawLoopW
+    JMP EXIT 
+   DRAWBLACK:
+
+
+
+   CMP imgFilename[0],'b' ;;BLACK
+   JNE DRAWGREEN
+    drawLoopB:
+    MOV AL,[BX]
+    CMP AL,0FH
+    JE NODRAWW
+    INT 10h
+    NODRAWW: 
+    INC CX
+    INC BX
+    CMP CX,imgWidth
+    JNE drawLoopB 
+	
+    MOV CX , 0
+    INC DX
+    CMP DX , imgHeight
+    JNE drawLoopB
+    JMP EXIT 
+
+   DRAWGREEN:
     drawLoop:
     MOV AL,[BX]
     INT 10h 
@@ -47,33 +95,13 @@ INT 10h      ;/
     CMP DX , imgHeight
     JNE drawLoop
 
-	
-    ; Press any key to exit
-    MOV AH , 0
-    INT 16h
-    
+
+    EXIT:
+
     call CloseFile
     
-    ;Change to Text MODE
-    MOV AH,0          
-    MOV AL,03h
-    INT 10h 
-
-    ; return control to operating system
-    MOV AH , 4ch
-    INT 21H
-
-
-
 
 Print ENDP
-
-
-
-
-
-
-
 
 OpenFile PROC 
 
