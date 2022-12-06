@@ -1,4 +1,5 @@
 EXTRN imgFilename:BYTE
+EXTRN MODE:BYTE
 
 PUBLIC Print
 
@@ -21,26 +22,22 @@ Print PROC FAR
 
 
 
-;//////////////
-mov AX,4F02h ;/
-mov BX,103h  ;/  graph 800*600  256 colors
-INT 10h      ;/
-;//////////////
+
 
     CALL OpenFile
     CALL ReadData
 	
     LEA BX , imgData ; BL contains index at the current drawn pixel
 	
-    MOV CX,0   ;COL 
-    MOV DX,0    ;ROW
+    MOV CX,0 ;COL 
+    MOV DX,0   ;ROW
     MOV AH,0ch
 	
 
 
 ; Drawing loop
 
-   CMP imgFilename[0],'w' ;;WHITE
+   CMP MODE,0 ;;WHITE
     JNE DRAWBLACK
     drawLoopW:
     MOV AL,[BX]
@@ -58,11 +55,11 @@ INT 10h      ;/
     CMP DX , imgHeight
     JNE drawLoopW
     JMP EXIT 
-   DRAWBLACK:
+    DRAWBLACK:
 
 
 
-   CMP imgFilename[0],'b' ;;BLACK
+   CMP MODE,1 ;;BLACK
    JNE DRAWGREEN
     drawLoopB:
     MOV AL,[BX]
