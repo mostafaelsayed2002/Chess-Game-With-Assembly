@@ -1,5 +1,14 @@
 EXTRN imgFilename:BYTE
 EXTRN MODE:BYTE
+EXTRN XSTART:WORD
+EXTRN YSTART:WORD
+EXTRN XEND:WORD
+EXTRN YEND:WORD
+
+;XSTART ,YSTART IS THE START OF PHOTO 
+;XEND ,YEND IS THE END OF PHOTO
+
+
 
 PUBLIC Print
 
@@ -19,18 +28,13 @@ Print PROC FAR
   MOV AX , @DATA
   MOV DS , AX
 
-
-
-
-
-
     CALL OpenFile
     CALL ReadData
-	
+    	
     LEA BX , imgData ; BL contains index at the current drawn pixel
 	
-    MOV CX,0 ;COL 
-    MOV DX,0   ;ROW
+    MOV CX,XSTART;COL 
+    MOV DX,YSTART  ;ROW
     MOV AH,0ch
 	
 
@@ -47,12 +51,12 @@ Print PROC FAR
     NODRAWB:
     INC CX
     INC BX
-    CMP CX,imgWidth
+    CMP CX,XEND
     JNE drawLoopW 
 	
-    MOV CX , 0
+    MOV CX , XSTART
     INC DX
-    CMP DX , imgHeight
+    CMP DX , YEND
     JNE drawLoopW
     JMP EXIT 
     DRAWBLACK:
@@ -69,12 +73,12 @@ Print PROC FAR
     NODRAWW: 
     INC CX
     INC BX
-    CMP CX,imgWidth
+    CMP CX,XEND
     JNE drawLoopB 
 	
-    MOV CX , 0
+    MOV CX , XSTART
     INC DX
-    CMP DX , imgHeight
+    CMP DX , YEND
     JNE drawLoopB
     JMP EXIT 
 
@@ -84,12 +88,12 @@ Print PROC FAR
     INT 10h 
     INC CX
     INC BX
-    CMP CX,imgWidth
+    CMP CX,XEND
     JNE drawLoop 
 	
-    MOV CX , 0
+    MOV CX , XSTART
     INC DX
-    CMP DX , imgHeight
+    CMP DX , YEND
     JNE drawLoop
 
 

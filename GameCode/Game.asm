@@ -1,10 +1,20 @@
 EXTRN Print:FAR
-PUBLIC imgFilename,MODE
+PUBLIC imgFilename,MODE,XSTART,YSTART,XEND,YEND
 
 
 .model small
 .STACK 64
 .DATA 
+
+XSTART DW 0
+YSTART DW 0
+XEND   DW 75
+YEND   DW 75
+COUNTCX DB 0
+COUNTDX DB 0
+CHECK DW 0
+
+
 
 MODE DB 0
 imgFilename DB 'mostafa.bin', 0
@@ -18,41 +28,64 @@ MAIN PROC FAR
 
 ;//////////////
 mov AX,4F02h ;/
-mov BX,103h  ;/  graph 800*600  256 colors
+mov BX,105h  ;/  graph 800*600  256 colors
 INT 10h      ;/
 ;//////////////
 
 
-mov imgFilename[0],'g'
-mov imgFilename[1],'r'
-mov imgFilename[2],'e'
-mov imgFilename[3],'e'
-mov imgFilename[4],'n'
-mov imgFilename[5],'2'
-mov imgFilename[6],'.'
-mov imgFilename[7],'b'
-mov imgFilename[8],'i'
-mov imgFilename[9],'n'
-mov imgFilename[10],0
-MOV MODE ,2
-CALL Print 
+MOV XSTART,0
+MOV XEND,75
+MOV YSTART,0
+MOV YEND,75
+MOV imgFilename[0],'G'
+MOV imgFilename[1],'1'
+MOV imgFilename[2],0
+MOV MODE,2
 
-mov imgFilename[0],'w'
-mov imgFilename[1],'k'
-mov imgFilename[2],'i'
-mov imgFilename[3],'n'
-mov imgFilename[4],'g'                   ;; MODE 0 ==>FOR PRINT WHITE PIC
-mov imgFilename[5],'.'                   ;; MODE 1 ==>FOR PRINT BLACK PIC
-mov imgFilename[6],'b'                   ;; MODE 2 ==>FOR PRINT SOLID SQUARE (GREEN1,GREEN2) PIC   
-mov imgFilename[7],'i'
-mov imgFilename[8],'n'
-mov imgFilename[9],0
-MOV MODE ,1                       
-CALL Print 
+    MYLOOP:
+    CALL PRINT
+    ADD XSTART,75
+    ADD XEND,75
+   
+    MOV AX,CHECK
+    MOV BL,2
+    DIV BL
+    CMP AH,0
+   JNE DRAWBACKGROUND2
+   MOV imgFilename[0],'G'
+   MOV imgFilename[1],'2' 
+   MOV imgFilename[2],0
+ 
+   JMP GO
+   DRAWBACKGROUND2:
+   MOV imgFilename[0],'G'
+   MOV imgFilename[1],'1'
+   MOV imgFilename[2],0
+   GO:
+   INC CHECK
+   INC COUNTCX
+   CMP COUNTCX,8
+  
+   JNE MYLOOP
+
+
+   MOV COUNTCX ,0
+   MOV XSTART,0
+   MOV XEND,75
+   ADD YEND,75
+   ADD YSTART,75
+   INC COUNTDX
+   CMP COUNTDX ,8
+
+    JNE MYLOOP
 
 
 
 
+
+                                         ;; MODE 0 ==>FOR PRINT WHITE PIC
+                                         ;; MODE 1 ==>FOR PRINT BLACK PIC
+                                         ;; MODE 2 ==>FOR PRINT SOLID SQUARE (GREEN1,GREEN2) PIC   
 
 
 
@@ -60,9 +93,9 @@ CALL Print
 
 
    ; Press any key to exit
-   MOV AH , 0
-   INT 16h
-   ;Change to Text MODE
+    MOV AH , 0
+    INT 16h
+    ;Change to Text MODE
     MOV AH,0          
     MOV AL,03h
     INT 10h 
