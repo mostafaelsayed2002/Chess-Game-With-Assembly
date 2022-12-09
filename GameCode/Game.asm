@@ -1,5 +1,6 @@
 EXTRN Print:FAR
-PUBLIC imgFilename,MODE,XSTART,YSTART,XEND,YEND
+
+PUBLIC imgFilename,MODE,XSTART,YSTART
 
 
 .model small
@@ -8,8 +9,6 @@ PUBLIC imgFilename,MODE,XSTART,YSTART,XEND,YEND
 
 XSTART DW 0
 YSTART DW 0
-XEND   DW 75
-YEND   DW 75
 COUNTCX DB 0
 COUNTDX DB 0
 CHECK DW 0
@@ -17,7 +16,7 @@ CHECK DW 0
 
 
 MODE DB 0
-imgFilename DB 'mostafa.bin', 0
+imgFilename DB 'GG', 0
 
 .CODE 
 MAIN PROC FAR 
@@ -28,24 +27,29 @@ MAIN PROC FAR
 
 ;//////////////
 mov AX,4F02h ;/
-mov BX,105h  ;/  graph 800*600  256 colors
+mov BX,103h  ;/  graph 800*600  256 colors
 INT 10h      ;/
 ;//////////////
 
-
-MOV XSTART,0
-MOV XEND,75
-MOV YSTART,0
-MOV YEND,75
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 MOV imgFilename[0],'G'
 MOV imgFilename[1],'1'
-MOV imgFilename[2],0
-MOV MODE,2
+MOV XSTART,525
+MOV YSTART,75
+CALL PRINT
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+MOV XSTART,0
+MOV YSTART,0
+
+
+
+
+MOV XSTART ,0
+MOV YSTART,150
 
     MYLOOP:
     CALL PRINT
     ADD XSTART,75
-    ADD XEND,75
    
     MOV AX,CHECK
     MOV BL,2
@@ -54,30 +58,48 @@ MOV MODE,2
    JNE DRAWBACKGROUND2
    MOV imgFilename[0],'G'
    MOV imgFilename[1],'2' 
-   MOV imgFilename[2],0
+
  
    JMP GO
    DRAWBACKGROUND2:
    MOV imgFilename[0],'G'
    MOV imgFilename[1],'1'
-   MOV imgFilename[2],0
+ 
    GO:
-   INC CHECK
    INC COUNTCX
+   CMP COUNTCX,7
+   JE MYLOOP
+   INC CHECK
+  
    CMP COUNTCX,8
   
    JNE MYLOOP
 
-
-   MOV COUNTCX ,0
+   MOV COUNTCX ,0 
    MOV XSTART,0
-   MOV XEND,75
-   ADD YEND,75
    ADD YSTART,75
-   INC COUNTDX
-   CMP COUNTDX ,8
+   INC COUNTDX 
+   CMP COUNTDX ,6
 
     JNE MYLOOP
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -86,6 +108,8 @@ MOV MODE,2
                                          ;; MODE 0 ==>FOR PRINT WHITE PIC
                                          ;; MODE 1 ==>FOR PRINT BLACK PIC
                                          ;; MODE 2 ==>FOR PRINT SOLID SQUARE (GREEN1,GREEN2) PIC   
+
+
 
 
 
@@ -111,4 +135,47 @@ END MAIN
 
 
 
+
+
+
+;MOV imgFilename[0],'G'
+;MOV imgFilename[1],'1'
+;MOV imgFilename[2],0
+;MOV MODE,2
+;
+;
+;MYOUTTER:
+;MOV COUNTINNER,8
+;
+;MYINNER:
+;CALL PRINT
+;ADD XSTART,75
+;ADD XEND,75
+;INC CHECK
+;
+;MOV AX,CHECK
+;MOV BL,2
+;DIV BL
+;CMP AH,0
+;JNE ODD
+;MOV imgFilename[0],'G'
+;MOV imgFilename[1],'1'
+;MOV imgFilename[2],0
+;JMP GO
+;ODD:
+;MOV imgFilename[0],'G'
+;MOV imgFilename[1],'2'
+;MOV imgFilename[2],0
+;GO:
+;
+;
+; 
+;DEC COUNTINNER
+;JNZ MYINNER
+;MOV XSTART,0
+;MOV XEND,75
+;ADD YSTART,75
+;ADD YEND,75
+;DEC COUNTOUTTER
+;JNZ MYOUTTER
 

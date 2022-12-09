@@ -2,11 +2,10 @@ EXTRN imgFilename:BYTE
 EXTRN MODE:BYTE
 EXTRN XSTART:WORD
 EXTRN YSTART:WORD
-EXTRN XEND:WORD
-EXTRN YEND:WORD
+
 
 ;XSTART ,YSTART IS THE START OF PHOTO 
-;XEND ,YEND IS THE END OF PHOTO
+
 
 
 
@@ -15,6 +14,9 @@ PUBLIC Print
 .MODEL SMALL
 .STACK 64
 .DATA 
+
+YEND DW 0
+XEND DW 0
 
 imgWidth  EQU 75
 imgHeight EQU 75
@@ -28,9 +30,19 @@ Print PROC FAR
   MOV AX , @DATA
   MOV DS , AX
 
+MOV AX,XSTART
+ADD AX,75              ;;GET THE END OF PHOTO XEND
+MOV XEND,AX
+
+MOV AX,YSTART
+ADD AX,75              ;;GET THE END OF PHOTO YEND
+MOV YEND,AX
+
+
+
     CALL OpenFile
     CALL ReadData
-    	
+
     LEA BX , imgData ; BL contains index at the current drawn pixel
 	
     MOV CX,XSTART;COL 
