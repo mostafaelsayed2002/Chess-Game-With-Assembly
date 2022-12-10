@@ -1,89 +1,163 @@
 EXTRN Print:FAR
-
+EXTRN PrintGrid:FAR
 PUBLIC imgFilename,MODE,XSTART,YSTART
 
 
 .model small
-.STACK 64
-.DATA 
+.STACK 512
+.DATA
 
-XSTART DW 0
-YSTART DW 0
-COUNTCX DB 0
-COUNTDX DB 0
-CHECK DW 0
+  XSTART      DW 0
+  YSTART      DW 0
+  MODE        DB 2
+  COUNT       DB 4
+  imgFilename DB 'G1', 0
 
+.CODE
+MAIN PROC FAR
 
-
-MODE DB 0
-imgFilename DB 'GG', 0
-
-.CODE 
-MAIN PROC FAR 
-
-  MOV AX , @DATA
-  MOV DS , AX
+          MOV  AX , @DATA
+          MOV  DS , AX
 
 
-;//////////////
-mov AX,4F02h ;/
-mov BX,103h  ;/  graph 800*600  256 colors
-INT 10h      ;/
-;//////////////
+  ;//////////////
+          mov  AX,4F02h            ;/
+          mov  BX,105h             ;/  graph 800*600  256 colors
+          INT  10h                 ;/
+  ;//////////////
+  
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-MOV imgFilename[0],'G'
-MOV imgFilename[1],'1'
-MOV XSTART,525
-MOV YSTART,75
-CALL PRINT
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-MOV XSTART,0
-MOV YSTART,0
-
-
-
-
-MOV XSTART ,0
-MOV YSTART,150
-
-    MYLOOP:
-    CALL PRINT
-    ADD XSTART,75
+  ;;; PRINT GRID==============================
+  MYLOOP: 
+          MOV  imgFilename[0],'G'
+          MOV  imgFilename[1],'L'
+          call PrintGrid
+          ADD  YSTART,75
+          MOV  imgFilename[0],'G'
+          MOV  imgFilename[1],'D'
+          call PrintGrid
+          ADD  YSTART,75
+          DEC  COUNT
+          JNZ  MYLOOP
+  ;;==============================================
    
-    MOV AX,CHECK
-    MOV BL,2
-    DIV BL
-    CMP AH,0
-   JNE DRAWBACKGROUND2
-   MOV imgFilename[0],'G'
-   MOV imgFilename[1],'2' 
+;;;PRINT POWN==================================
+          MOV  imgFilename[0],'W'
+          MOV  imgFilename[1],'P'
+          MOV  XSTART,0
+          MOV  YSTART,75
+          MOV  MODE ,0
+          MOV  COUNT ,8
+  MYLOOP1:
+          CALL PRINT
+          ADD  XSTART,75
+          DEC  COUNT
+          JNE  MYLOOP1
 
- 
-   JMP GO
-   DRAWBACKGROUND2:
-   MOV imgFilename[0],'G'
-   MOV imgFilename[1],'1'
- 
-   GO:
-   INC COUNTCX
-   CMP COUNTCX,7
-   JE MYLOOP
-   INC CHECK
-  
-   CMP COUNTCX,8
-  
-   JNE MYLOOP
-
-   MOV COUNTCX ,0 
-   MOV XSTART,0
-   ADD YSTART,75
-   INC COUNTDX 
-   CMP COUNTDX ,6
-
-    JNE MYLOOP
+          MOV  imgFilename[0],'B'
+          MOV  imgFilename[1],'P'
+          MOV  XSTART,0
+          MOV  YSTART,450
+          MOV  MODE ,1
+          MOV  COUNT ,8
+  MYLOOP2:
+          CALL PRINT
+          ADD  XSTART,75
+          DEC  COUNT
+          JNE  MYLOOP2
+  ;;============================================
 
 
+  ;;;PRINT LAST ROW==================================
+          MOV  imgFilename[0],'B'
+          MOV  imgFilename[1],'R'
+          MOV  XSTART,0
+          MOV  YSTART,525
+          CALL PRINT
+          MOV  imgFilename[0],'B'
+          MOV  imgFilename[1],'H'
+          MOV  XSTART,75
+          MOV  YSTART,525
+          CALL PRINT
+          MOV  imgFilename[0],'B'
+          MOV  imgFilename[1],'S'
+          MOV  XSTART,150
+          MOV  YSTART,525
+          CALL PRINT
+          MOV  imgFilename[0],'B'
+          MOV  imgFilename[1],'Q'
+          MOV  XSTART,225
+          MOV  YSTART,525
+          CALL PRINT
+          MOV  imgFilename[0],'B'
+          MOV  imgFilename[1],'K'
+          MOV  XSTART,300
+          MOV  YSTART,525
+          CALL PRINT
+
+          MOV  imgFilename[0],'B'
+          MOV  imgFilename[1],'S'
+          MOV  XSTART,375
+          MOV  YSTART,525
+          CALL PRINT
+          MOV  imgFilename[0],'B'
+          MOV  imgFilename[1],'H'
+          MOV  XSTART,450
+          MOV  YSTART,525
+          CALL PRINT
+
+          MOV  imgFilename[0],'B'
+          MOV  imgFilename[1],'R'
+          MOV  XSTART,525
+          MOV  YSTART,525
+          CALL PRINT
+ ;;============================================
+
+  MOV MODE,0
+  ;;;PRINT FIRST ROW==================================
+          MOV  imgFilename[0],'W'
+          MOV  imgFilename[1],'R'
+          MOV  XSTART,0
+          MOV  YSTART,0
+          CALL PRINT
+          MOV  imgFilename[0],'W'
+          MOV  imgFilename[1],'H'
+          MOV  XSTART,75
+          MOV  YSTART,0
+          CALL PRINT
+          MOV  imgFilename[0],'W'
+          MOV  imgFilename[1],'S'
+          MOV  XSTART,150
+          MOV  YSTART,0
+          CALL PRINT
+          MOV  imgFilename[0],'W'
+          MOV  imgFilename[1],'Q'
+          MOV  XSTART,225
+          MOV  YSTART,0
+          CALL PRINT
+          MOV  imgFilename[0],'W'
+          MOV  imgFilename[1],'K'
+          MOV  XSTART,300
+          MOV  YSTART,0
+          CALL PRINT
+
+          MOV  imgFilename[0],'W'
+          MOV  imgFilename[1],'S'
+          MOV  XSTART,375
+          MOV  YSTART,0
+          CALL PRINT
+          MOV  imgFilename[0],'W'
+          MOV  imgFilename[1],'H'
+          MOV  XSTART,450
+          MOV  YSTART,0
+          CALL PRINT
+
+          MOV  imgFilename[0],'W'
+          MOV  imgFilename[1],'R'
+          MOV  XSTART,525
+          MOV  YSTART,0
+          CALL PRINT
+ ;;============================================
 
 
 
@@ -105,9 +179,6 @@ MOV YSTART,150
 
 
 
-                                         ;; MODE 0 ==>FOR PRINT WHITE PIC
-                                         ;; MODE 1 ==>FOR PRINT BLACK PIC
-                                         ;; MODE 2 ==>FOR PRINT SOLID SQUARE (GREEN1,GREEN2) PIC   
 
 
 
@@ -116,16 +187,21 @@ MOV YSTART,150
 
 
 
-   ; Press any key to exit
-    MOV AH , 0
-    INT 16h
-    ;Change to Text MODE
-    MOV AH,0          
-    MOV AL,03h
-    INT 10h 
-    ;return control to operating system
-    MOV AH , 4ch
-    INT 21H
+
+
+
+   
+
+  ; Press any key to exit
+          MOV  AH , 0
+          INT  16h
+  ;Change to Text MODE
+          MOV  AH,0
+          MOV  AL,03h
+          INT  10h
+  ;return control to operating system
+          MOV  AH , 4ch
+          INT  21H
 
 
 
@@ -137,45 +213,4 @@ END MAIN
 
 
 
-
-;MOV imgFilename[0],'G'
-;MOV imgFilename[1],'1'
-;MOV imgFilename[2],0
-;MOV MODE,2
-;
-;
-;MYOUTTER:
-;MOV COUNTINNER,8
-;
-;MYINNER:
-;CALL PRINT
-;ADD XSTART,75
-;ADD XEND,75
-;INC CHECK
-;
-;MOV AX,CHECK
-;MOV BL,2
-;DIV BL
-;CMP AH,0
-;JNE ODD
-;MOV imgFilename[0],'G'
-;MOV imgFilename[1],'1'
-;MOV imgFilename[2],0
-;JMP GO
-;ODD:
-;MOV imgFilename[0],'G'
-;MOV imgFilename[1],'2'
-;MOV imgFilename[2],0
-;GO:
-;
-;
-; 
-;DEC COUNTINNER
-;JNZ MYINNER
-;MOV XSTART,0
-;MOV XEND,75
-;ADD YSTART,75
-;ADD YEND,75
-;DEC COUNTOUTTER
-;JNZ MYOUTTER
 
