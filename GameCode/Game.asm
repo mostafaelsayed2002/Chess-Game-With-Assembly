@@ -820,22 +820,4 @@ GETPLACEB PROC
 GETPLACEB ENDP
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 END MAIN    
-
-
-
-
-
-
