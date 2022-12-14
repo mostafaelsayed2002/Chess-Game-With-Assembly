@@ -339,7 +339,9 @@ MAIN PROC FAR
       ;; AND STORE  IT IN  "SHAPESTORAGE"      
        MOV AL,STATE0[BX+2]
        CMP AL,'X'          ;;THIS CHECK IF IT IS EMPY CELL AND PLAYER WANT TO MOVE IF WHICH IS FORBIEDDEN                                                  
-       JE here                                                                                   
+       JE here 
+       CMP AL,'B'
+       JE here 
        MOV SHAPESTORAGE[0],AL                           
        MOV AL,STATE0[BX+3]
        MOV SHAPESTORAGE[1],AL
@@ -352,12 +354,15 @@ MAIN PROC FAR
        MOV PLACESTORAGEY,AX                    
        JMP CheckKeyPressed
  
+
+
     ;;IF IT IS NOT EMPTY WE DO THE FOLLOWING:
        NOTEMPTY:
        MOV DX,XSTART    
        MOV CX,YSTART                        
        PUSH DX                 
        PUSH CX                        ;;GET OLD PLACE
+       
        MOV AX,PLACESTORAGEX  
        MOV XSTART,AX                         
        MOV AX ,PLACESTORAGEY
@@ -383,6 +388,9 @@ MAIN PROC FAR
        CALL GETPLACE
        MOV BX,place                                       
        PUSH BX
+       MOV AL ,state0[BX+2]
+       CMP AL,'W'
+       JE HHERE
        MOV AL,state0 [BX]                 
        MOV  imgFilename[0], AL 
        MOV AH, state0[BX+1]          ;printing the background  OF THE NEW CELL  TO DELETE THE ANIMY SHAPE IF EXSITS          
@@ -390,6 +398,7 @@ MAIN PROC FAR
        MOV MODE,2
        CALL PRINT
    
+     
        POP BX 
        MOV AL,SHAPESTORAGE[0]
        MOV  imgFilename[0], AL            ;;GET OLD SHAPE AND PRINT IT ON THE NEW CELL
@@ -400,8 +409,11 @@ MAIN PROC FAR
        MOV MODE ,0
        CALL PRINT
         
+        HHERE:
         MOV SHAPESTORAGE[0],'Y'            ;;RETURN THE SHAPE STORAGE EMPTY AGAIN
         MOV SHAPESTORAGE[1],'Y'
+       
+     
       JMP CheckKeyPressed
 ;;==========================================================================
 ;;=========================================================================
