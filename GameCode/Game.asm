@@ -59,7 +59,7 @@ imgFilename DB 'G1', 0
 
                 ; 'G','D','B','R',       'G','L','B','H',       'G','D','B','S',       'G','L','B','Q',       'G','D','B','K',       'G','L','B','S',       'G','D','B','H',       'G','L','B','R',
                  
-STATE0       DB         'G','L','W','R'  ,'G','D','W','H'  ,'G','L','W','S'  ,'G','D','W','Q'  ,'G','L','W','K'  ,'G','D','W','S' ,'G','L','W','H'  ,'G','D','W','R'
+STATE0       DB         'G','L','W','R',  ,'G','D','W','H'  ,'G','L','W','S'  ,'G','D','W','Q'  ,'G','L','W','K'  ,'G','D','W','S' ,'G','L','W','H'  ,'G','D','W','R'
 
 STATE1       DB         'G','D','W','P'  ,'G','L','W','P'  ,'G','D','W','P'  ,'G','L','W','P'  ,'G','D','W','P'  ,'G','L','W','P' ,'G','D','W','P'  ,'G','L','W','P'
 
@@ -74,8 +74,23 @@ STATE5       DB         'G','D','X','X'  ,'G','L','X','X'  ,'G','D','X','X'  ,'G
 STATE6       DB         'G','L','B','P'  ,'G','D','B','P'  ,'G','L','B','P'  ,'G','D','B','P'  ,'G','L','B','P'  ,'G','D','B','P' ,'G','L','B','P'  ,'G','D','B','P'
 
 STATE7       DB         'G','D','B','R'  ,'G','L','B','H'  ,'G','D','B','S'  ,'G','L','B','Q'  ,'G','D','B','K'  ,'G','L','B','S' ,'G','D','B','H'  ,'G','L','B','R'
-                 
 
+TIME0        DB         'X','X','X','X',  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+
+TIME1        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+
+TIME2        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+
+TIME3        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+
+TIME4        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+
+TIME5        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+
+TIME6        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+
+TIME7        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+                                  
 
   
 
@@ -440,7 +455,42 @@ MAIN PROC FAR
        PRESS_ENTER:
        CMP SHAPESTORAGE[0],'Y'    ;CHECK IF IS EMPTY
        JNE NOTEMPTY
+;;=========================CHECK TIME=======================================  
+  MOV AH,02h
+  INT 1Ah                                   ; CH         Hours (BCD)
+   CALL GETPLACE                            ; CL         Minutes (BCD)
+   MOV BX ,PLACE                            ; DH         Seconds (BCD)
+   MOV AL,TIME0[BX]                            
+   CMP AL,'X'    
+   JE FIRSTMOVE_OR_MORE_THAN_3SEC
+    CMP AL ,CH                             ;Hours
+    JNE FIRSTMOVE_OR_MORE_THAN_3SEC
+    MOV AL,TIME0[BX+1]                     ;Minutes
+    CMP AL,CL 
+    JNE FIRSTMOVE_OR_MORE_THAN_3SEC
+    MOV AL,TIME0[BX+2]                     ;Seconds
+    CMP DH,AL 
+    JA DHISGREATER
+    JE here 
+SUB DH,AL
+    CMP DH,3
+    JAE FIRSTMOVE_OR_MORE_THAN_3SEC
+    
 
+
+    DHISGREATER:
+    SUB DH,AL
+    CMP DH,3
+    JAE FIRSTMOVE_OR_MORE_THAN_3SEC
+    
+                         
+
+
+
+
+
+;;=========================================================================
+FIRSTMOVE_OR_MORE_THAN_3SEC:
        ;;EMPTY --> GET ITS PLACE WHICH IS WANTED TO MOVE 
        CALL GETPLACE       
        MOV BX ,place 
