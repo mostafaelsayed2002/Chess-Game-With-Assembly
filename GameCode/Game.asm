@@ -480,17 +480,18 @@ MAIN PROC FAR
    MOV YOLD,AX 
    MOV AX,YSTART
    MOV YNEW,AX
-
+ ;XOLD ,YOLD ,XNEW ,YNEW
    MOV AL,SHAPESTORAGE[1]
    CMP AL,'R'
-   JE TABEA   
+   JE TABEA
+
+; ADD YOUR COMPARSION HERE :
+
+
+
+
+
    JMP CODE1
-
-
-
-
-
-
 ;;===============================================================================================
 ;;==========================TABEA==========================================================
    TABEA:
@@ -501,8 +502,6 @@ MAIN PROC FAR
   CMP XNEW,AX
   JE MOTION_YDIR
   JMP HHERE
- 
-
 ;==============================================================
     MOTION_XDIR:
     MOV AX,XOLD
@@ -572,19 +571,28 @@ MOV AL,STATE0[BX+2]
 CMP AL,'X'
 JNE TOHHERE
 JMP MOTION_IN_YNEGATIVE
-;==============================================================
+;=========================================================================================
+;;                      ADD YOUR CODE HERE: 
+
+
+
+
+
+
+
+
+
+
+
+
+;=========================================================================================
 TOHHERE:
  POP AX
  MOV YSTART,AX
  POP AX
  MOV XSTART,AX
 JMP JUMPTOHHERE
-
 ;===========================================================================================
-
-
-
- 
 CODE1:
  POP AX
  MOV YSTART,AX
