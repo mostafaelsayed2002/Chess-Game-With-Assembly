@@ -1,3 +1,4 @@
+.286
 EXTRN Print:FAR
 EXTRN PrintGrid:FAR
 EXTRN PRINTB:FAR
@@ -33,8 +34,10 @@ place           DW 0
 
 placeB           DW 0
 
-
-
+XOLD DW 0
+XNEW DW 0
+YOLD DW 0
+YNEW DW 0
 
 
 imgFilename DB 'G1', 0
@@ -464,15 +467,136 @@ MAIN PROC FAR
 
     ;;IF IT IS NOT EMPTY WE DO THE FOLLOWING:
        NOTEMPTY:
-   
        ;; HERE WE PRINT ON THE NEW CELL
    
+;;==========================COMPARSIONS==========================================================
+   PUSH XSTART
+   PUSH YSTART
+   MOV AX,PLACESTORAGEX   
+   MOV XOLD,AX
+   MOV AX,XSTART
+   MOV XNEW,AX 
+   MOV AX,PLACESTORAGEY
+   MOV YOLD,AX 
+   MOV AX,YSTART
+   MOV YNEW,AX
+
+   MOV AL,SHAPESTORAGE[1]
+   CMP AL,'R'
+   JE TABEA   
+   JMP CODE1
+
+
+
+
+
+
+;;===============================================================================================
+;;==========================TABEA==========================================================
+   TABEA:
+  MOV AX,YOLD
+  CMP YNEW,AX          
+  JE MOTION_XDIR
+  MOV AX,XOLD
+  CMP XNEW,AX
+  JE MOTION_YDIR
+  JMP HHERE
+ 
+
+;==============================================================
+    MOTION_XDIR:
+    MOV AX,XOLD
+    CMP XNEW,AX
+    JA MOTION_IN_XPOSITIVE
+    JB MOTION_IN_XNEGATIVE
+;============================================================== 
+MOTION_IN_XPOSITIVE:
+ADD XOLD,75
+MOV BX,XNEW        ; IN +VE DIR
+CMP XOLD,BX
+JE TOCODE
+MOV AX,XOLD
+MOV XSTART,AX
+CALL GETPLACE
+MOV BX,PLACE
+MOV AL,STATE0[BX+2]
+CMP AL,'X'
+JNE TOHHERE
+JMP MOTION_IN_XPOSITIVE
+;==============================================================
+MOTION_IN_XNEGATIVE:
+SUB XOLD,75
+MOV BX,XNEW           ;IN -VE DIR
+CMP XOLD,BX
+TOCODE:
+JE CODE1
+MOV AX,XOLD
+MOV XSTART,AX
+CALL GETPLACE
+MOV BX,PLACE
+MOV AL,STATE0[BX+2]
+CMP AL,'X'
+JNE TOHHERE
+JMP MOTION_IN_XNEGATIVE
+;==============================================================
+MOTION_YDIR:
+    MOV AX,YOLD
+    CMP YNEW,AX
+    JA MOTION_IN_YPOSITIVE
+    JB MOTION_IN_YNEGATIVE
+;==============================================================
+MOTION_IN_YPOSITIVE:
+ADD YOLD,75
+MOV BX,YNEW        ; IN +VE DIR
+CMP YOLD,BX
+JE CODE1
+MOV AX,YOLD
+MOV YSTART,AX
+CALL GETPLACE
+MOV BX,PLACE
+MOV AL,STATE0[BX+2]
+CMP AL,'X'
+JNE TOHHERE
+JMP MOTION_IN_YPOSITIVE
+;==============================================================
+MOTION_IN_YNEGATIVE:
+SUB YOLD,75
+MOV BX,YNEW           ;IN -VE DIR
+CMP YOLD,BX
+JE CODE1
+MOV AX,YOLD
+MOV YSTART,AX
+CALL GETPLACE
+MOV BX,PLACE
+MOV AL,STATE0[BX+2]
+CMP AL,'X'
+JNE TOHHERE
+JMP MOTION_IN_YNEGATIVE
+;==============================================================
+TOHHERE:
+ POP AX
+ MOV YSTART,AX
+ POP AX
+ MOV XSTART,AX
+JMP JUMPTOHHERE
+
+;===========================================================================================
+
+
+
+ 
+CODE1:
+ POP AX
+ MOV YSTART,AX
+ POP AX
+ MOV XSTART,AX
+
        CALL GETPLACE
        MOV BX,place                                       
        PUSH BX
        MOV AL ,state0[BX+2]
        CMP AL,'W'
-       JE HHERE
+       JE JUMPTOHHERE
        MOV AL,state0 [BX]                 
        MOV  imgFilename[0], AL 
        MOV AH, state0[BX+1]          ;printing the background  OF THE NEW CELL  TO DELETE THE ANIMY SHAPE IF EXSITS          
@@ -480,7 +604,6 @@ MAIN PROC FAR
        MOV MODE,2
        CALL PRINT
    
-     
        POP BX 
        MOV AL,SHAPESTORAGE[0]
        MOV  imgFilename[0], AL            ;;GET OLD SHAPE AND PRINT IT ON THE NEW CELL
@@ -490,14 +613,25 @@ MAIN PROC FAR
        MOV  STATE0[BX+3],AL 
        MOV MODE ,0
        CALL PRINT
+       MOV  imgFilename[0],'F'         
+       MOV  imgFilename[1],'R'    ;PRINT HIGHLIGHT AT THE FIRST CELL
+          MOV MODE,1
+       CALL PRINT                            
+                         
+      
 
+
+   
+         JMP GOAT
+        JUMPTOHHERE:   
+        JMP HHERE
+
+        GOAT:
 
        MOV AX,XSTART 
        PUSH AX                         
        MOV AX ,YSTART
        PUSH AX  
-
-
 
         ;;GET OLD PLACE  
        MOV AX,PLACESTORAGEX  
@@ -582,7 +716,7 @@ MAIN PROC FAR
        PUSH BX
        MOV AL ,state0[BX+2]
        CMP AL,'B'
-       JE HHERE1
+       JE JUMPTOHHEREB
        MOV AL,state0 [BX]                 
        MOV  imgFilename[0], AL 
        MOV AH, state0[BX+1]          ;printing the background  OF THE NEW CELL  TO DELETE THE ANIMY SHAPE IF EXSITS          
@@ -600,7 +734,21 @@ MAIN PROC FAR
        MOV  STATE0[BX+3],AL 
        MOV MODEB ,1
        CALL PRINTB
+        MOV  imgFilename[0],'F'         
+        MOV  imgFilename[1],'B'    ;PRINT HIGHLIGHT AT THE FIRST CELL
+        MOV MODE,1
+        CALL PRINTB       
        
+     
+         JMP GOATB
+         
+        JUMPTOHHEREB:   
+        JMP HHERE1
+
+        GOATB:
+
+
+
        MOV AX,XSTARTB 
        PUSH AX                         
        MOV AX ,YSTARTB
