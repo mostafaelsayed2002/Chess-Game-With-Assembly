@@ -1198,6 +1198,12 @@ CODE1:
        MOV AL ,state0[BX+2]
        CMP AL,'W'
        JE JUMPTOHHERE
+       ;;Check if the killed one is king,then the game is over 
+       MOV AL , state0[BX+3]
+       CMP AL , 'K'
+       JNE CON
+       JMP PRESS_ESC
+       CON:
        MOV AL,state0 [BX]                 
        MOV  imgFilename[0], AL 
        MOV AH, state0[BX+1]          ;printing the background  OF THE NEW CELL  TO DELETE THE ANIMY SHAPE IF EXSITS          
@@ -2091,9 +2097,7 @@ CODEB1B:
 
 
  PRESS_ESC:
-  ; Press any key to exit
-          MOV  AH , 0
-          INT  16h
+  ;END GAME
   ;Change to Text MODE
           MOV  AH,0
           MOV  AL,03h
