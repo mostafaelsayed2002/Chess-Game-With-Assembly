@@ -2027,6 +2027,12 @@ CODEB1B:
        MOV AL ,state0[BX+2]
        CMP AL,'B'
        JE JUMPTOHHEREB
+       ;;Check if the killed one is king,then the game is over 
+       MOV AL , state0[BX+3]
+       CMP AL , 'K'
+       JNE CONB
+       JMP PRESS_ESC
+       CONB:
        MOV AL,state0 [BX]                 
        MOV  imgFilename[0], AL 
        MOV AH, state0[BX+1]          ;printing the background  OF THE NEW CELL  TO DELETE THE ANIMY SHAPE IF EXSITS          
