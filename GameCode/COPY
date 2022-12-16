@@ -1,608 +1,108 @@
+;;=========================CHECK TIME=======================================  
+   PUSH AX 
+   PUSH BX 
+   PUSH CX 
+   PUSH DX
+   MOV AH,2ch ;11:39:00
+   INT 21h                               ; CH         Hours (BCD)
+   CALL GETPLACEB                            ; CL         Minutes (BCD)
+   MOV BX ,PLACEB                            ; DH         Seconds (BCD)
+   MOV AL,TIME0[BX]
+   ;Check if it is the first MOVEB                             
+   CMP AL,'X'    
+   JE FIRSTMOVEB_OR_MORE_THAN_3SEC
+   
+   MOV AH,CH    ;NEW HOUR IN AH 
+   CMP AL,AH     
+   JE CHECK_MINB ;IF OLD_HOUR = NEW_HOUR
+   DEC AH 
+   CMP AL,AH 
+   JNE FIRSTMOVEB_OR_MORE_THAN_3SEC
+   ;CASE 2 ---> CHECK MIN ---> EX: 10:59:59 -> 11:00:01
+   MOV AL , TIME0[BX+1]
+   MOV AH , CL 
+   CMP AL , 59 
+   JNE FIRSTMOVEB_OR_MORE_THAN_3SEC 
+   CMP AH , 00 
+   JNE FIRSTMOVEB_OR_MORE_THAN_3SEC 
+   JMP OUR_LOGICB
+
+   CHECK_MINB:
+      MOV BX , PLACEB
+      MOV AL,TIME0[BX+1]
+      MOV AH,CL 
+      CMP AL , AH 
+      JE OUR_LOGICB
+      DEC AH 
+      CMP AL , AH 
+      JNE FIRSTMOVEB_OR_MORE_THAN_3SEC
+      JA OUR_LOGICB
+
+
+
+
+BRIDGE_TO_NOTEMPTYB:  
+JMP NOTEMPTYB
+
+
+
+OUR_LOGICB:
+
+    MOV AL,TIME0[BX+2]                     ;Seconds
+    CMP DH,AL 
+    JA DH_IS_GREATERB 
+    ; If AL IS GREATERB
+    SUB AL,DH
+    CMP Al,3
+    JAE FIRSTMOVEB_OR_MORE_THAN_3SEC
+    JMP hereB
+    
+
+
+    DH_IS_GREATERB:
+    SUB DH,AL
+    CMP DH,3
+    JAE FIRSTMOVEB_OR_MORE_THAN_3SEC
+    JMP hereB
+    
+                         
+
+
+
+
+
+;;=========================================================================
+FIRSTMOVEB_OR_MORE_THAN_3SEC:
+       POP DX 
+       POP CX 
+       POP BX 
+       POP AX
+       ;;EMPTY --> GET ITS PLACEB WHICH IS WANTED TO MOVEB 
+       CALL GETPLACEB       
+       MOV BX ,PLACEB 
+      ;;THEN  GET THE SHAPE WHICH IS WANTED TO MOVEB
+      ;; AND STORE  IT IN  "SHAPESTORAGE"      
+       MOV AL,STATE0[BX+2]
+       CMP AL,'X'          ;;THIS CHECK IF IT IS EMPY CELL AND PLAYER WANT TO MOVEB IF WHICH IS FORBIEDDEN                                                  
+       JE BRIDGE_TO_hereB 
+       CMP AL,'B'
+       JE BRIDGE_TO_hereB 
+       MOV SHAPESTORAGEB[0],AL                           
+       MOV AL,STATE0[BX+3]
+       MOV SHAPESTORAGEB[1],AL
+
+      ;;THEN  GET THE X,Y
+      ;; AND STORE  IT IN  "PLACEBSTORAGEX" ,PLACEBSTORAGEY
+       MOV AX,XSTART                 
+       MOV PLACESTORAGEBX,AX
+       MOV AX,YSTART                         
+       MOV PLACESTORAGEBY,AX                    
+       JMP CheckKeyPressedB
+ 
+       BRIDGE_TO_hereB:
+       JMP hereB 
+    ;;IF IT IS NOT EMPTY WE DO THE FOLLOWING:
+       NOTEMPTYB:
+       ;; hereB WE PRINT ON THE NEW CELL
+   
 ;;==========================COMPARSIONS==========================================================
-   PUSH XSTARTB
-   PUSH YSTARTB
-   MOV AX,PLACEBSTORAGEBX   
-   MOV XOLD,AX
-   MOV AX,XSTARTB
-   MOV XNEW,AX 
-   MOV AX,PLACEBSTORAGEBY
-   MOV YOLD,AX 
-   MOV AX,YSTARTB
-   MOV YNEW,AX
- ;XOLD ,YOLD ,XNEW ,YNEW
-   MOV AL,SHAPESTORAGEB[1]
-   CMP Al,'S'
-   jE BISHOPB
-   CMP AL,'R'
-   JE TABEAB11
-   CMP AL,'Q'
-   JE QUEENB11
-   JMP  STATION_FOR_NEXT_COMPARSIONSB
-
-
-
-
-; ADD YOUR COMPARSION HERE :
-
-
-
-
-
-   JMP CODEB1B
-;;===============================================================================================
-;==============================================BISHOPB============================================
-  BISHOPB:
-mov ax,XNEW
-mov bx,XOLD
-cmp ax,bx
-jg CHECKB1
-jmp CHECKB2
-CHECKB1:
-mov ax,YNEW
-mov bx,YOLD
-cmp ax,bx
-jg MOVEB1
-jmp MOVEB2
-CHECKB2:
-mov ax,YNEW
-mov bx,YOLD
-cmp ax,bx
-jg MOVEB3
-jmp MOVEB4
-MOVEB1: ;x>,y>
-mov ax,XNEW
-sub ax,XOLD
-mov bx,YNEW
-sub bx,YOLD
-cmp ax,bx
-jz  CHECKBMOVEB1
-jmp InvalidB 
-MOVEB2: ;x>,y<
-mov ax,XNEW
-sub ax,XOLD
-mov bx,YOLD
-sub bx,YNEW
-cmp ax,bx
-jz  CHECKBMOVEB2
-jmp InvalidB   
-TABEAB11:
-JMP TABEAB
-MOVEB3: ;x<,y>
-mov ax,XOLD
-sub ax,XNEW
-mov bx,YNEW
-sub bx,YOLD
-cmp ax,bx
-jz  STATIONTOCHECKBMOVEB3
-jmp InvalidB
-QUEENB11:
-JMP QUEENB
-MOVEB4: ;x<,y<
-mov ax,XOLD
-sub ax,XNEW
-mov bx,YOLD
-sub bx,YNEW
-cmp ax,bx
-jz  STATIONTOCHECKBMOVEB4
-jmp InvalidB
-; -----------------------------------------
-InvalidB:
- CMP IsQUEENB,1
- jE TABEAB12
- JMP HHEREB
- ;-------------------------------------------
- ;Loop Till You Reach Destination,Or You Hit A Piece
- CHECKBMOVEB1:
- Add XOLD,75
- Add YOLD,75
- MOV AX,XNEW
- cmp AX,XOLD
- JE GOTOCODEBB
-MOV AX,XOLD
-MOV XSTARTB,AX
-MOV AX,YOLD
-MOV YSTARTB,AX
-CALL GETPLACEB
-MOV BX,PLACEB
-MOV Al,STATE0[BX+2]
-CMP AL,'X'
-JNE FORINVAILDBISHOPB
-JMP CHECKBMOVEB1
-
-        JMP FORBISHOPB
-        STATIONTOCHECKBMOVEB3:   
-        JMP CHECKBMOVEB3
-        FORBISHOPB:
-
-CHECKBMOVEB2:
- Add XOLD,75
- SUB YOLD,75
- MOV AX,XNEW
- cmp AX,XOLD
-  GOTOCODEBB:
- JE FORVAILDBISHOPB
- MOV AX,XOLD
- MOV XSTARTB,AX
- MOV AX,YOLD
- MOV YSTARTB,AX
- CALL GETPLACEB
- MOV BX,PLACEB
- MOV Al,STATE0[BX+2]
- CMP AL,'X'
- JNE STATIONTOHHEREB0
- JMP CHECKBMOVEB2 
-
-TABEAB12:
-JMP TABEAB
-
-         JMP FORBISHOPB1  
-         STATIONTOCHECKBMOVEB4:   
-         JMP CHECKBMOVEB4
-         FORBISHOPB1:
-
- CHECKBMOVEB3:
- SUB XOLD,75
- Add YOLD,75
- MOV AX,XNEW
- cmp AX,XOLD
-FORVAILDBISHOPB:
- JE STATIONTOCODEB0
- MOV AX,XOLD
- MOV XSTARTB,AX
- MOV AX,YOLD
- MOV YSTARTB,AX
- CALL GETPLACEB
- MOV BX,PLACEB
- MOV Al,STATE0[BX+2]
- CMP AL,'X'
-FORINVAILDBISHOPB:
- JNE STATIONTOHHEREB0
- JMP CHECKBMOVEB3
-
- CHECKBMOVEB4:
- SUB XOLD,75
- SUB YOLD,75
- MOV AX,XNEW
- cmp AX,XOLD
- JE STATIONTOCODEB0
- MOV AX,XOLD
- MOV XSTARTB,AX
- MOV AX,YOLD
- MOV YSTARTB,AX
- CALL GETPLACEB
- MOV BX,PLACEB
- MOV Al,STATE0[BX+2]
- CMP AL,'X'
- JNE STATIONTOHHEREB0
- JMP CHECKBMOVEB4
-;=========================================================================================
-;=========================================QUEENB===========================================
-QUEENB:
-mov IsQUEENB,1
-JMP BISHOPB
-;=======================================STATION(0)=======================================
-STATIONTOHHEREB0:
-JMP TOHHEREB
-STATIONTOCODEB0:
-JMP CODEB1B
-;=========================================================================================
-
-;=========================================================================================
-;;==========================TABEAB=========================================================
-  TABEAB:
-  MOV AX,YOLD
-  CMP YNEW,AX          
-  JE MOTIONB_XDIR
-  MOV AX,XOLD
-  CMP XNEW,AX
-  JE MOTIONB_YDIR
-  JMP HHEREB
-;==============================================================
-    MOTIONB_XDIR:
-    MOV AX,XOLD
-    CMP XNEW,AX
-    JA MOTIONB_IN_XPOSITIVE
-    JB MOTIONB_IN_XNEGATIVE
-;============================================================== 
-MOTIONB_IN_XPOSITIVE:
-ADD XOLD,75
-MOV BX,XNEW        ; IN +VE DIR
-CMP XOLD,BX
-JE TOCODEB
-MOV AX,XOLD
-MOV XSTARTB,AX
-CALL GETPLACEB
-MOV BX,PLACEB
-MOV AL,STATE0[BX+2]
-CMP AL,'X'
-JNE STATIONTOHHEREB1
-JMP MOTIONB_IN_XPOSITIVE
-;==============================================================
-MOTIONB_IN_XNEGATIVE:
-SUB XOLD,75
-MOV BX,XNEW           ;IN -VE DIR
-CMP XOLD,BX
-TOCODEB:
-JE STATIONTOCODEB1B
-MOV AX,XOLD
-MOV XSTARTB,AX
-CALL GETPLACEB
-MOV BX,PLACEB
-MOV AL,STATE0[BX+2]
-CMP AL,'X'
-JNE STATIONTOHHEREB1
-JMP MOTIONB_IN_XNEGATIVE
-;==============================================================
-MOTIONB_YDIR:
-    MOV AX,YOLD
-    CMP YNEW,AX
-    JA MOTIONB_IN_YPOSITIVE
-    JB MOTIONB_IN_YNEGATIVE
-;==============================================================
-MOTIONB_IN_YPOSITIVE:
-ADD YOLD,75
-MOV BX,YNEW        ; IN +VE DIR
-CMP YOLD,BX
-JE STATIONTOCODEB1B
-MOV AX,YOLD
-MOV YSTARTB,AX
-CALL GETPLACEB
-MOV BX,PLACEB
-MOV AL,STATE0[BX+2]
-CMP AL,'X'
-JNE STATIONTOHHEREB1
-JMP MOTIONB_IN_YPOSITIVE
-;==============================================================
-MOTIONB_IN_YNEGATIVE:
-SUB YOLD,75
-MOV BX,YNEW           ;IN -VE DIR
-CMP YOLD,BX
-JE STATIONTOCODEB1B
-MOV AX,YOLD
-MOV YSTARTB,AX
-CALL GETPLACEB
-MOV BX,PLACEB
-MOV AL,STATE0[BX+2]
-CMP AL,'X'
-JNE STATIONTOHHEREB1
-JMP MOTIONB_IN_YNEGATIVE
-;======================================STATIONT(1)============================================
-STATIONTOHHEREB1:
-JMP TOHHEREB
-STATIONTOCODEB1B:
-JMP CODEB1B
-;==========================STATION_FOR_NEXT_COMPARSIONSB====================================
-STATION_FOR_NEXT_COMPARSIONSB:
-   CMP AL,'H'
-   JE HORSEB 
-   JMP STATION1_FOR_NEXT_COMPARSIONSB
-;===========================================================================================
-;===========================================================================================
-;;==========================HORSEB===========================================================
-HORSEB:
-MOV AX,XOLD
-MOV BX,YOLD
-ADD AX,150 ;rightB DOWNB
-ADD BX,75
-CMP AX,XNEW
-JE  rightB_DOWNB_YESB
-jne rightB_UPB
-rightB_DOWNB_YESB:
-CMP BX,YNEW
-jne rightB_UPB
-jmp CODEB1B
-;;;;;;;;;;;;;;;;;;;;;;;
-rightB_UPB:
-MOV AX,XOLD
-MOV BX,YOLD
-ADD AX,150
-SUB BX,75
-CMP AX,XNEW     ;rightB UPB
-JE rightB_UPB_YESB
-jne leftB_DOWNB
-rightB_UPB_YESB:
-CMP BX,YNEW
-jne leftB_DOWNB
-jmp CODEB1B
-;;;;;;;;;;;;;;;;;;;;;;;;;
-leftB_DOWNB:
-MOV AX,XOLD
-MOV BX,YOLD
-SUB AX,150
-ADD BX,75
-CMP AX,XNEW     ;leftB DOWNB
-JE leftB_DOWNB_YESB
-jne leftB_UPB
-leftB_DOWNB_YESB:
-CMP BX,YNEW
-jne leftB_UPB
-jmp CODEB1B
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-leftB_UPB:
-MOV AX,XOLD
-MOV BX,YOLD
-SUB AX,150
-SUB BX,75       ;leftB UPB
-CMP AX,XNEW
-JE leftB_UPB_YESB
-jne UPB_rgihtB
-leftB_UPB_YESB:
-CMP BX,YNEW
-jne UPB_rgihtB
-jmp CODEB1B
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-UPB_rgihtB:
-MOV AX,XOLD
-MOV BX,YOLD
-SUB BX,150
-ADD AX,75
-CMP AX,XNEW     ;UPB rightB
-JE UPB_rgihtB_YESB
-jne UPB_leftB
-UPB_rgihtB_YESB:
-CMP BX,YNEW
-jne UPB_leftB
-jmp CODEB1B
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-UPB_leftB:
-MOV AX,XOLD
-MOV BX,YOLD
-SUB BX,150
-SUB AX,75
-CMP AX,XNEW     ;UPB leftB
-JE UPB_leftB_YESB
-jne DOWNB_rightB
-UPB_leftB_YESB:
-CMP BX,YNEW
-jne DOWNB_rightB
-jmp CODEB1B
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-DOWNB_rightB:
-MOV AX,XOLD
-MOV BX,YOLD
-ADD BX,150
-ADD AX,75
-CMP AX,XNEW
-JE DOWNB_rightB_YESB
-jne DOWNB_leftB
-DOWNB_rightB_YESB:
-CMP BX,YNEW
-jne DOWNB_leftB
-jmp CODEB1B
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-DOWNB_leftB:
-MOV AX,XOLD
-MOV BX,YOLD
-ADD BX,150
-SUB AX,75
-CMP AX,XNEW
-JE DOWNB_leftB_YESB
-jne STATIONTOHHEREB2
-DOWNB_leftB_YESB:
-CMP BX,YNEW
-jne STATIONTOHHEREB2
-jmp CODEB1B
-;===========================================================================================
-;======================================STATIONT(2)============================================
-STATIONTOHHEREB2:
-JMP TOHHEREB
-STATIONTOCODEB2:
-JMP CODEB1B
-;===========================================================================================
-;==========================STATION1_FOR_NEXT_COMPARSIONSB====================================
-STATION1_FOR_NEXT_COMPARSIONSB:
-   CMP AL,'K'
-   JE KINGB 
- JMP STATION2_FOR_NEXT_COMPARSIONSB
-;===========================================================================================
-;;==========================KINGB============================================================
-KINGB:
-mov AX,XOLD
-mov BX,YOLD
-ADD AX,75       ;MOVEBs to the rightB
-CMP AX,XNEW
-je XRYESB
-jne UPBrightB
-XRYESB:
-CMP BX,YNEW
-jne UPBrightB
-Jmp CODEB1B
-;;;;;;;;;;;
-UPBrightB:
-mov AX,XOLD
-mov BX,YOLD
-SUB BX,75
-ADD Ax,75
-CMP AX,XNEW
-je XURYESB
-jne UPB
-XURYESB:
-CMP BX,YNEW
-jne UPB
-jmp CODEB1B
-;;;;;;;;;;;
-UPB:
-mov AX,XOLD
-mov BX,YOLD
-SUB BX,75
-CMP AX,XNEW
-je XUYESB
-jne UPBleftB
-XUYESB:
-CMP BX,YNEW
-jne UPBleftB
-jmp CODEB1B
-;;;;;;;;;;
-UPBleftB:
-mov AX,XOLD
-mov BX,YOLD
-SUB AX,75
-SUB BX,75
-CMP AX,XNEW
-je XULYESB
-jne leftB
-XULYESB:
-CMP BX,YNEW
-jne leftB
-jmp CODEB1B
-;;;;;;;;;;;
-leftB:
-mov AX,XOLD
-mov BX,YOLD
-SUB AX,75
-CMP AX,XNEW
-je XLYESB
-jne DOWNBleftB
-XLYESB:
-CMP BX,YNEW
-jne DOWNBleftB
-jmp CODEB1B
-;;;;;;;;;;;;
-DOWNBleftB:
-mov AX,XOLD
-mov BX,YOLD
-SUB AX,75
-ADD BX,75       
-CMP AX,XNEW
-je XDLYESB
-jne DOWNB
-XDLYESB:
-CMP BX,YNEW
-jne DOWNB
-jmp CODEB1B
-;;;;;;;;;;;;
-DOWNB:
-mov AX,XOLD
-mov BX,YOLD
-ADD BX,75       
-CMP AX,XNEW
-je XDYESB
-jne DOWNBrightB
-XDYESB:
-CMP BX,YNEW
-jne DOWNBrightB
-jmp CODEB1B
-;;;;;;;;;;;;
-DOWNBrightB:
-mov AX,XOLD
-mov BX,YOLD
-ADD AX,75
-ADD BX,75       
-CMP AX,XNEW
-je XDRYESB
-jne STATIONTOHHEREB3
-XDRYESB:
-CMP BX,YNEW
-jne STATIONTOHHEREB3;InvalidB MOVEB
-jmp CODEB1B
-;===========================================================================================
-;======================================STATIONT(3)============================================
-STATIONTOHHEREB3:
-JMP TOHHEREB
-STATIONTOCODEB3:
-JMP CODEB1B
-;===========================================================================================
-;==========================STATION2_FOR_NEXT_COMPARSIONSB====================================
-STATION2_FOR_NEXT_COMPARSIONSB:
-   CMP AL,'P'
-   je POWNB
-   JMP CODEB1B ;=====****** 
-;===========================================================================================
-;==========================================POWNB=============================================
-
-POWNB:
-MOV AX,XOLD
-MOV BX,YOLD
-cmp BX,450
-je tow_MOVEBs
-;;;;;;
-one_MOVEB:
-SUB BX,75
-cmp BX,YNEW
-jne TOHHEREB2
-cmp AX,XNEW
-jne CHECKB3
-;
-;jne diagonalB_mov_positive 
-mov XSTARTB,AX
-mov YSTARTB,BX
-call GETPLACEB
-mov BX,PLACEB
-MOV AL ,state0[BX+2];MOVEB odam
-cmp AL,'X'
-je CODEB2
-jne TOHHEREB2 
-;
-CHECKB3:
-cmp AX,XNEW
-jA diagonalB_mov_negative
-JL diagonalB_mov_positive
-
-diagonalB_mov_positive:
-SUB AX,75
-mov XSTARTB,AX
-mov YSTARTB,BX
-call GETPLACEB
-mov BX,PLACEB
-MOV AL ,state0[BX+2]
-cmp AL,'B'
-je CODEB2
-jne TOHHEREB2
-
-diagonalB_mov_negative:
-ADD AX,75
-mov XSTARTB,AX
-mov YSTARTB,BX
-call GETPLACEB
-mov BX,PLACEB
-MOV AL ,state0[BX+2]
-cmp AL,'B'
-je CODEB1B
-jne TOHHEREB2
-;;;;;;;;;;;;;
-CODEB2:
-jmp CODEB1B
-TOHHEREB2:
-jmp TOHHEREB
-
-
-tow_MOVEBs:
-SUB BX,75
-cmp BX,YNEW
-jne anotherB_col
-cmp AX,XNEW
-jne CHECKB3
-je CHECKB_X
-anotherB_col:
-SUB BX,75
-cmp BX,YNEW
-je CHECKB_X
-jne TOHHEREB
-CHECKB_X:
-cmp AX,XNEW
-jne TOHHEREB 
-mov XSTARTB,AX
-mov YSTARTB,BX
-call GETPLACEB
-mov BX,PLACEB
-MOV AL ,state0[BX+2]
-cmp AL,'X'
-je CODEB1B
-jne TOHHEREB
-;===========================================================================================
-;===========================================================================================
-
-
-;===========================================================================================
-TOHHEREB:
- POP AX
- MOV YSTARTB,AX
- POP AX
- MOV XSTARTB,AX
-JMP JUMPTOHHEREB
-;===========================================================================================
-CODEB1B:
- POP AX
- MOV YSTARTB,AX
- POP AX
- MOV XSTARTB,AX

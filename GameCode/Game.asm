@@ -77,21 +77,23 @@ STATE6       DB         'G','L','B','P'  ,'G','D','B','P'  ,'G','L','B','P'  ,'G
 
 STATE7       DB         'G','D','B','R'  ,'G','L','B','H'  ,'G','D','B','S'  ,'G','L','B','Q'  ,'G','D','B','K'  ,'G','L','B','S' ,'G','D','B','H'  ,'G','L','B','R'
 
-;TIME0        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
 
-;TIME1        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
 
-;TIME2        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+TIME0        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
 
-;TIME3        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+TIME1        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
 
-;TIME4        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+TIME2        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
 
-;TIME5        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+TIME3        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
 
-;TIME6        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+TIME4        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
 
-;TIME7        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+TIME5        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+
+TIME6        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+
+TIME7        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
                                   
 
   
@@ -456,37 +458,86 @@ MAIN PROC FAR
 
        PRESS_ENTER:
        CMP SHAPESTORAGE[0],'Y'    ;CHECK IF IS EMPTY
-       JNE NOTEMPTY
-;;=========================CHECK TIME=======================================  
- ;;MOV AH,02h
- ;;INT 1Ah                                   ; CH         Hours (BCD)
- ;; CALL GETPLACE                            ; CL         Minutes (BCD)
- ;; MOV BX ,PLACE                            ; DH         Seconds (BCD)
- ;; MOV AL,TIME0[BX]                            
- ;; CMP AL,'X'    
- ;; JE FIRSTMOVE_OR_MORE_THAN_3SEC
- ;;  CMP AL ,CH                             ;Hours
- ;;  JNE FIRSTMOVE_OR_MORE_THAN_3SEC
- ;;  MOV AL,TIME0[BX+1]                     ;Minutes
- ;;  CMP AL,CL 
- ;;  JNE FIRSTMOVE_OR_MORE_THAN_3SEC
- ;;  MOV AL,TIME0[BX+2]                     ;Seconds
- ;;  CMP DH,AL 
- ;;  JA DHISGREATER
- ;;  JE here 
- ;; SUB DH,AL
- ;;  CMP DH,3
- ;;  JAE FIRSTMOVE_OR_MORE_THAN_3SEC
- ;;  
+       JNE BRIDGE_TO_NOTEMPTY
+;;=========================CHECK TIME =======================================  
+   PUSH AX 
+   PUSH BX 
+   PUSH CX 
+   PUSH DX
+   MOV AH,2ch ;11:39:00
+   INT 21h                               ; CH         Hours (BCD)
+   CALL GETPLACE                            ; CL         Minutes (BCD)
+   MOV BX ,PLACE                            ; DH         Seconds (BCD)
+   MOV AL,TIME0[BX]
+   ;Check if it is the first move                             
+   CMP AL,'X'    
+   JE FIRSTMOVE_OR_MORE_THAN_3SEC
+   
+   MOV AH,CH    ;NEW HOUR IN AH 
+   CMP AL,AH     
+   JE CHECK_MIN ;IF OLD_HOUR = NEW_HOUR
+   DEC AH 
+   CMP AL,AH 
+   JNE FIRSTMOVE_OR_MORE_THAN_3SEC
+   ;CASE 2 ---> CHECK MIN ---> EX: 10:59:59 -> 11:00:01
+   MOV AL , TIME0[BX+1]
+   MOV AH , CL 
+   CMP AL , 59 
+   JNE FIRSTMOVE_OR_MORE_THAN_3SEC 
+   CMP AH , 00 
+   JNE FIRSTMOVE_OR_MORE_THAN_3SEC 
+   JMP OUR_LOGIC
+
+   CHECK_MIN:
+      MOV BX , PLACE
+      MOV AL,TIME0[BX+1]
+      MOV AH,CL 
+      CMP AL , AH 
+      JE OUR_LOGIC
+      DEC AH 
+      CMP AL , AH 
+      JNE FIRSTMOVE_OR_MORE_THAN_3SEC
+      JA OUR_LOGIC
 
 
- ;;  DHISGREATER:
- ;;  SUB DH,AL
- ;;  CMP DH,3
- ;;  JAE FIRSTMOVE_OR_MORE_THAN_3SEC
- ;;  
+
+
+BRIDGE_TO_NOTEMPTY:  
+JMP NOTEMPTY
+
+
+
+OUR_LOGIC:
+
+    MOV AL,TIME0[BX+2]                     ;Seconds
+    CMP DH,AL 
+    JA DH_IS_GREATER 
+    ; If AL IS GREATER
+    SUB AL,DH
+    CMP Al,3
+    JAE FIRSTMOVE_OR_MORE_THAN_3SEC
+    JMP here
+    
+
+
+    DH_IS_GREATER:
+    SUB DH,AL
+    CMP DH,3
+    JAE FIRSTMOVE_OR_MORE_THAN_3SEC
+    JMP here
+    
+                         
+
+
+
+
+
 ;;=========================================================================
-;FIRSTMOVE_OR_MORE_THAN_3SEC:
+FIRSTMOVE_OR_MORE_THAN_3SEC:
+       POP DX 
+       POP CX 
+       POP BX 
+       POP AX
        ;;EMPTY --> GET ITS PLACE WHICH IS WANTED TO MOVE 
        CALL GETPLACE       
        MOV BX ,place 
@@ -494,9 +545,9 @@ MAIN PROC FAR
       ;; AND STORE  IT IN  "SHAPESTORAGE"      
        MOV AL,STATE0[BX+2]
        CMP AL,'X'          ;;THIS CHECK IF IT IS EMPY CELL AND PLAYER WANT TO MOVE IF WHICH IS FORBIEDDEN                                                  
-       JE here 
+       JE BRIDGE_TO_here 
        CMP AL,'B'
-       JE here 
+       JE BRIDGE_TO_here 
        MOV SHAPESTORAGE[0],AL                           
        MOV AL,STATE0[BX+3]
        MOV SHAPESTORAGE[1],AL
@@ -509,8 +560,8 @@ MAIN PROC FAR
        MOV PLACESTORAGEY,AX                    
        JMP CheckKeyPressed
  
-
-
+       BRIDGE_TO_here:
+       JMP here 
     ;;IF IT IS NOT EMPTY WE DO THE FOLLOWING:
        NOTEMPTY:
        ;; HERE WE PRINT ON THE NEW CELL
@@ -1123,6 +1174,23 @@ CODE1:
  MOV YSTART,AX
  POP AX
  MOV XSTART,AX
+ ;;=================Update Time Array================================
+   PUSH AX 
+   PUSH BX 
+   PUSH CX 
+   PUSH DX
+   MOV AH,2ch    ;New Time 
+   INT 21h                                  ; CH         Hours (BCD)
+   CALL GETPLACE                            ; CL         Minutes (BCD)
+   MOV BX ,PLACE                            ; DH         Seconds (BCD)
+   MOV TIME0[BX],CH
+   MOV TIME0[BX+1],CL 
+   MOV TIME0[BX+2],DH
+   POP DX 
+   POP CX 
+   POP BX 
+   POP AX 
+;;==================================================================
 
        CALL GETPLACE
        MOV BX,place                                       
@@ -1212,10 +1280,83 @@ CODE1:
 
        PRESS_Q:
        CMP SHAPESTORAGEB[0],'Y'    ;CHECK IF IS EMPTY
-       JNE NOTEMPTY1
+       JNE BRIDGE_TO_NOTEMPTYB
+;;==========================================================================
+;;=========================CHECK TIME=======================================  
+   PUSH AX 
+   PUSH BX 
+   PUSH CX 
+   PUSH DX
+   MOV AH,2ch ;11:39:00
+   INT 21h                               ; CH         Hours (BCD)
+   CALL GETPLACEB                            ; CL         Minutes (BCD)
+   MOV BX ,PLACEB                            ; DH         Seconds (BCD)
+   MOV AL,TIME0[BX]
+   ;Check if it is the first MOVEB                             
+   CMP AL,'X'    
+   JE FIRSTMOVEB_OR_MORE_THAN_3SEC
+   
+   MOV AH,CH    ;NEW HOUR IN AH 
+   CMP AL,AH     
+   JE CHECK_MINB ;IF OLD_HOUR = NEW_HOUR
+   DEC AH 
+   CMP AL,AH 
+   JNE FIRSTMOVEB_OR_MORE_THAN_3SEC
+   ;CASE 2 ---> CHECK MIN ---> EX: 10:59:59 -> 11:00:01
+   MOV AL , TIME0[BX+1]
+   MOV AH , CL 
+   CMP AL , 59 
+   JNE FIRSTMOVEB_OR_MORE_THAN_3SEC 
+   CMP AH , 00 
+   JNE FIRSTMOVEB_OR_MORE_THAN_3SEC 
+   JMP OUR_LOGICB
 
-       ;;EMPTY --> GET ITS PLACE WHICH IS WANTED TO MOVE 
-       CALL GETPLACEB       
+   CHECK_MINB:
+      MOV BX , PLACEB
+      MOV AL,TIME0[BX+1]
+      MOV AH,CL 
+      CMP AL , AH 
+      JE OUR_LOGICB
+      DEC AH 
+      CMP AL , AH 
+      JNE FIRSTMOVEB_OR_MORE_THAN_3SEC
+      JA OUR_LOGICB
+
+
+
+
+BRIDGE_TO_NOTEMPTYB:  
+JMP NOTEMPTY1
+
+
+
+OUR_LOGICB:
+
+    MOV AL,TIME0[BX+2]                     ;Seconds
+    CMP DH,AL 
+    JA DH_IS_GREATERB 
+    ; If AL IS GREATERB
+    SUB AL,DH
+    CMP Al,3
+    JAE FIRSTMOVEB_OR_MORE_THAN_3SEC
+    JMP hereB1
+    
+
+
+    DH_IS_GREATERB:
+    SUB DH,AL
+    CMP DH,3
+    JAE FIRSTMOVEB_OR_MORE_THAN_3SEC
+    JMP hereB1
+
+;;=========================================================================
+FIRSTMOVEB_OR_MORE_THAN_3SEC:
+       POP DX 
+       POP CX 
+       POP BX 
+       POP AX
+       ;;EMPTY --> GET ITS PLACEB WHICH IS WANTED TO MOVEB 
+       CALL GETPLACEB        
        MOV BX ,placeB 
       ;;THEN  GET THE SHAPE WHICH IS WANTED TO MOVE
       ;; AND STORE  IT IN  "SHAPESTORAGEB"      
@@ -1851,26 +1992,23 @@ CODEB1B:
  POP AX
  MOV XSTARTB,AX
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+;;=================Update Time Array OF SECOND PLAYER================================
+   PUSH AX 
+   PUSH BX 
+   PUSH CX 
+   PUSH DX
+   MOV AH,2ch    ;New Time 
+   INT 21h                                  ; CH         Hours (BCD)
+   CALL GETPLACEB                            ; CL         Minutes (BCD)
+   MOV BX ,PLACEB                            ; DH         Seconds (BCD)
+   MOV TIME0[BX],CH
+   MOV TIME0[BX+1],CL 
+   MOV TIME0[BX+2],DH
+   POP DX 
+   POP CX 
+   POP BX 
+   POP AX 
+;;==================================================================
 ;===================;=;=;========================================
 
 
