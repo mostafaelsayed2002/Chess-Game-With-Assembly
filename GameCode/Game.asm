@@ -38,7 +38,9 @@ XOLD DW 0
 XNEW DW 0
 YOLD DW 0
 YNEW DW 0
-
+;; for queen /BISHOP/ROOK
+IsQueen DB 0
+IsQUEENB DB 0
 
 imgFilename DB 'G1', 0
 
@@ -59,7 +61,7 @@ imgFilename DB 'G1', 0
 
                 ; 'G','D','B','R',       'G','L','B','H',       'G','D','B','S',       'G','L','B','Q',       'G','D','B','K',       'G','L','B','S',       'G','D','B','H',       'G','L','B','R',
                  
-STATE0       DB         'G','L','W','R',  ,'G','D','W','H'  ,'G','L','W','S'  ,'G','D','W','Q'  ,'G','L','W','K'  ,'G','D','W','S' ,'G','L','W','H'  ,'G','D','W','R'
+STATE0       DB         'G','L','W','R'  ,'G','D','W','H'  ,'G','L','W','S'  ,'G','D','W','Q'  ,'G','L','W','K'  ,'G','D','W','S' ,'G','L','W','H'  ,'G','D','W','R'
 
 STATE1       DB         'G','D','W','P'  ,'G','L','W','P'  ,'G','D','W','P'  ,'G','L','W','P'  ,'G','D','W','P'  ,'G','L','W','P' ,'G','D','W','P'  ,'G','L','W','P'
 
@@ -75,21 +77,21 @@ STATE6       DB         'G','L','B','P'  ,'G','D','B','P'  ,'G','L','B','P'  ,'G
 
 STATE7       DB         'G','D','B','R'  ,'G','L','B','H'  ,'G','D','B','S'  ,'G','L','B','Q'  ,'G','D','B','K'  ,'G','L','B','S' ,'G','D','B','H'  ,'G','L','B','R'
 
-TIME0        DB         'X','X','X','X',  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+;TIME0        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
 
-TIME1        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+;TIME1        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
 
-TIME2        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+;TIME2        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
 
-TIME3        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+;TIME3        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
 
-TIME4        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+;TIME4        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
 
-TIME5        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+;TIME5        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
 
-TIME6        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+;TIME6        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
 
-TIME7        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+;TIME7        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
                                   
 
   
@@ -456,41 +458,35 @@ MAIN PROC FAR
        CMP SHAPESTORAGE[0],'Y'    ;CHECK IF IS EMPTY
        JNE NOTEMPTY
 ;;=========================CHECK TIME=======================================  
-  MOV AH,02h
-  INT 1Ah                                   ; CH         Hours (BCD)
-   CALL GETPLACE                            ; CL         Minutes (BCD)
-   MOV BX ,PLACE                            ; DH         Seconds (BCD)
-   MOV AL,TIME0[BX]                            
-   CMP AL,'X'    
-   JE FIRSTMOVE_OR_MORE_THAN_3SEC
-    CMP AL ,CH                             ;Hours
-    JNE FIRSTMOVE_OR_MORE_THAN_3SEC
-    MOV AL,TIME0[BX+1]                     ;Minutes
-    CMP AL,CL 
-    JNE FIRSTMOVE_OR_MORE_THAN_3SEC
-    MOV AL,TIME0[BX+2]                     ;Seconds
-    CMP DH,AL 
-    JA DHISGREATER
-    JE here 
-SUB DH,AL
-    CMP DH,3
-    JAE FIRSTMOVE_OR_MORE_THAN_3SEC
-    
+ ;;MOV AH,02h
+ ;;INT 1Ah                                   ; CH         Hours (BCD)
+ ;; CALL GETPLACE                            ; CL         Minutes (BCD)
+ ;; MOV BX ,PLACE                            ; DH         Seconds (BCD)
+ ;; MOV AL,TIME0[BX]                            
+ ;; CMP AL,'X'    
+ ;; JE FIRSTMOVE_OR_MORE_THAN_3SEC
+ ;;  CMP AL ,CH                             ;Hours
+ ;;  JNE FIRSTMOVE_OR_MORE_THAN_3SEC
+ ;;  MOV AL,TIME0[BX+1]                     ;Minutes
+ ;;  CMP AL,CL 
+ ;;  JNE FIRSTMOVE_OR_MORE_THAN_3SEC
+ ;;  MOV AL,TIME0[BX+2]                     ;Seconds
+ ;;  CMP DH,AL 
+ ;;  JA DHISGREATER
+ ;;  JE here 
+ ;; SUB DH,AL
+ ;;  CMP DH,3
+ ;;  JAE FIRSTMOVE_OR_MORE_THAN_3SEC
+ ;;  
 
 
-    DHISGREATER:
-    SUB DH,AL
-    CMP DH,3
-    JAE FIRSTMOVE_OR_MORE_THAN_3SEC
-    
-                         
-
-
-
-
-
+ ;;  DHISGREATER:
+ ;;  SUB DH,AL
+ ;;  CMP DH,3
+ ;;  JAE FIRSTMOVE_OR_MORE_THAN_3SEC
+ ;;  
 ;;=========================================================================
-FIRSTMOVE_OR_MORE_THAN_3SEC:
+;FIRSTMOVE_OR_MORE_THAN_3SEC:
        ;;EMPTY --> GET ITS PLACE WHICH IS WANTED TO MOVE 
        CALL GETPLACE       
        MOV BX ,place 
@@ -532,8 +528,16 @@ FIRSTMOVE_OR_MORE_THAN_3SEC:
    MOV YNEW,AX
  ;XOLD ,YOLD ,XNEW ,YNEW
    MOV AL,SHAPESTORAGE[1]
+   CMP Al,'S'
+   jE Bishop
    CMP AL,'R'
-   JE TABEA
+   JE TABEA11
+   CMP AL,'Q'
+   JE Queen11
+   JMP  STATION_FOR_NEXT_COMPARSIONS
+
+
+
 
 ; ADD YOUR COMPARSION HERE :
 
@@ -543,8 +547,166 @@ FIRSTMOVE_OR_MORE_THAN_3SEC:
 
    JMP CODE1
 ;;===============================================================================================
-;;==========================TABEA==========================================================
-   TABEA:
+;==============================================Bishop============================================
+  Bishop:
+mov ax,XNEW
+mov bx,XOLD
+cmp ax,bx
+jg check1
+jmp check2
+check1:
+mov ax,YNEW
+mov bx,YOLD
+cmp ax,bx
+jg move1
+jmp move2
+check2:
+mov ax,YNEW
+mov bx,YOLD
+cmp ax,bx
+jg move3
+jmp move4
+move1: ;x>,y>
+mov ax,XNEW
+sub ax,XOLD
+mov bx,YNEW
+sub bx,YOLD
+cmp ax,bx
+jz  checkmove1
+jmp Invalid 
+move2: ;x>,y<
+mov ax,XNEW
+sub ax,XOLD
+mov bx,YOLD
+sub bx,YNEW
+cmp ax,bx
+jz  checkmove2
+jmp Invalid   
+TABEA11:
+JMP TABEA
+move3: ;x<,y>
+mov ax,XOLD
+sub ax,XNEW
+mov bx,YNEW
+sub bx,YOLD
+cmp ax,bx
+jz  STATIONTOcheckmove3
+jmp Invalid
+Queen11:
+JMP Queen
+move4: ;x<,y<
+mov ax,XOLD
+sub ax,XNEW
+mov bx,YOLD
+sub bx,YNEW
+cmp ax,bx
+jz  STATIONTOcheckmove4
+jmp Invalid
+; -----------------------------------------
+Invalid:
+ CMP IsQueen,1
+ jE TABEA12
+ JMP HHERE
+ ;-------------------------------------------
+ ;Loop Till You Reach Destination,Or You Hit A Piece
+ checkmove1:
+ Add XOLD,75
+ Add YOLD,75
+ MOV AX,XNEW
+ cmp AX,XOLD
+ JE GOTOCODE
+MOV AX,XOLD
+MOV XSTART,AX
+MOV AX,YOLD
+MOV YSTART,AX
+CALL GETPLACE
+MOV BX,PLACE
+MOV Al,STATE0[BX+2]
+CMP AL,'X'
+JNE FORINVAILDBISHOP
+JMP checkmove1
+
+        JMP FORBISHOP
+        STATIONTOcheckmove3:   
+        JMP checkmove3
+        FORBISHOP:
+
+checkmove2:
+ Add XOLD,75
+ SUB YOLD,75
+ MOV AX,XNEW
+ cmp AX,XOLD
+  GOTOCODE:
+ JE FORVAILDBISHOP
+ MOV AX,XOLD
+ MOV XSTART,AX
+ MOV AX,YOLD
+ MOV YSTART,AX
+ CALL GETPLACE
+ MOV BX,PLACE
+ MOV Al,STATE0[BX+2]
+ CMP AL,'X'
+ JNE STATIONTOHHERE0
+ JMP checkmove2 
+
+TABEA12:
+JMP TABEA
+
+         JMP FORBISHOP1  
+         STATIONTOcheckmove4:   
+         JMP checkmove4
+         FORBISHOP1:
+
+ checkmove3:
+ SUB XOLD,75
+ Add YOLD,75
+ MOV AX,XNEW
+ cmp AX,XOLD
+FORVAILDBISHOP:
+ JE STATIONTOCODE0
+ MOV AX,XOLD
+ MOV XSTART,AX
+ MOV AX,YOLD
+ MOV YSTART,AX
+ CALL GETPLACE
+ MOV BX,PLACE
+ MOV Al,STATE0[BX+2]
+ CMP AL,'X'
+FORINVAILDBISHOP:
+ JNE STATIONTOHHERE0
+ JMP checkmove3
+
+ checkmove4:
+ SUB XOLD,75
+ SUB YOLD,75
+ MOV AX,XNEW
+ cmp AX,XOLD
+ JE STATIONTOCODE0
+ MOV AX,XOLD
+ MOV XSTART,AX
+ MOV AX,YOLD
+ MOV YSTART,AX
+ CALL GETPLACE
+ MOV BX,PLACE
+ MOV Al,STATE0[BX+2]
+ CMP AL,'X'
+ JNE STATIONTOHHERE0
+ JMP checkmove4
+;=========================================================================================
+;=========================================Queen===========================================
+Queen:
+mov IsQueen,1
+JMP Bishop
+;=======================================STATION(0)=======================================
+STATIONTOHHERE0:
+JMP TOHHERE
+STATIONTOCODE0:
+JMP CODE1
+;=========================================================================================
+
+;=========================================================================================
+;;==========================TABEA=========================================================
+  TABEA:
   MOV AX,YOLD
   CMP YNEW,AX          
   JE MOTION_XDIR
@@ -570,7 +732,7 @@ CALL GETPLACE
 MOV BX,PLACE
 MOV AL,STATE0[BX+2]
 CMP AL,'X'
-JNE TOHHERE
+JNE STATIONTOHHERE1
 JMP MOTION_IN_XPOSITIVE
 ;==============================================================
 MOTION_IN_XNEGATIVE:
@@ -578,14 +740,14 @@ SUB XOLD,75
 MOV BX,XNEW           ;IN -VE DIR
 CMP XOLD,BX
 TOCODE:
-JE CODE1
+JE STATIONTOCODE1
 MOV AX,XOLD
 MOV XSTART,AX
 CALL GETPLACE
 MOV BX,PLACE
 MOV AL,STATE0[BX+2]
 CMP AL,'X'
-JNE TOHHERE
+JNE STATIONTOHHERE1
 JMP MOTION_IN_XNEGATIVE
 ;==============================================================
 MOTION_YDIR:
@@ -598,44 +760,357 @@ MOTION_IN_YPOSITIVE:
 ADD YOLD,75
 MOV BX,YNEW        ; IN +VE DIR
 CMP YOLD,BX
-JE CODE1
+JE STATIONTOCODE1
 MOV AX,YOLD
 MOV YSTART,AX
 CALL GETPLACE
 MOV BX,PLACE
 MOV AL,STATE0[BX+2]
 CMP AL,'X'
-JNE TOHHERE
+JNE STATIONTOHHERE1
 JMP MOTION_IN_YPOSITIVE
 ;==============================================================
 MOTION_IN_YNEGATIVE:
 SUB YOLD,75
 MOV BX,YNEW           ;IN -VE DIR
 CMP YOLD,BX
-JE CODE1
+JE STATIONTOCODE1
 MOV AX,YOLD
 MOV YSTART,AX
 CALL GETPLACE
 MOV BX,PLACE
 MOV AL,STATE0[BX+2]
 CMP AL,'X'
-JNE TOHHERE
+JNE STATIONTOHHERE1
 JMP MOTION_IN_YNEGATIVE
-;=========================================================================================
-;;                      ADD YOUR CODE HERE: 
+;======================================STATIONT(1)============================================
+STATIONTOHHERE1:
+JMP TOHHERE
+STATIONTOCODE1:
+JMP CODE1
+;==========================STATION_FOR_NEXT_COMPARSIONS====================================
+STATION_FOR_NEXT_COMPARSIONS:
+   CMP AL,'H'
+   JE HORSE 
+   JMP STATION1_FOR_NEXT_COMPARSIONS
+;===========================================================================================
+;===========================================================================================
+;;==========================HORSE===========================================================
+HORSE:
+MOV AX,XOLD
+MOV BX,YOLD
+ADD AX,150 ;right down
+ADD BX,75
+CMP AX,XNEW
+JE  right_down_YES
+jne right_UP
+right_down_YES:
+CMP BX,YNEW
+jne right_UP
+jmp CODE1
+;;;;;;;;;;;;;;;;;;;;;;;
+right_UP:
+MOV AX,XOLD
+MOV BX,YOLD
+ADD AX,150
+SUB BX,75
+CMP AX,XNEW     ;right up
+JE right_UP_YES
+jne left_down
+right_UP_YES:
+CMP BX,YNEW
+jne left_down
+jmp CODE1
+;;;;;;;;;;;;;;;;;;;;;;;;;
+left_down:
+MOV AX,XOLD
+MOV BX,YOLD
+SUB AX,150
+ADD BX,75
+CMP AX,XNEW     ;left down
+JE left_down_YES
+jne left_UP
+left_down_YES:
+CMP BX,YNEW
+jne left_UP
+jmp CODE1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+left_UP:
+MOV AX,XOLD
+MOV BX,YOLD
+SUB AX,150
+SUB BX,75       ;left up
+CMP AX,XNEW
+JE left_UP_YES
+jne up_rgiht
+left_UP_YES:
+CMP BX,YNEW
+jne up_rgiht
+jmp CODE1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+up_rgiht:
+MOV AX,XOLD
+MOV BX,YOLD
+SUB BX,150
+ADD AX,75
+CMP AX,XNEW     ;up right
+JE up_rgiht_YES
+jne up_left
+up_rgiht_YES:
+CMP BX,YNEW
+jne up_left
+jmp CODE1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+up_left:
+MOV AX,XOLD
+MOV BX,YOLD
+SUB BX,150
+SUB AX,75
+CMP AX,XNEW     ;up left
+JE up_left_YES
+jne down_right
+up_left_YES:
+CMP BX,YNEW
+jne down_right
+jmp CODE1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+down_right:
+MOV AX,XOLD
+MOV BX,YOLD
+ADD BX,150
+ADD AX,75
+CMP AX,XNEW
+JE down_right_YES
+jne down_left
+down_right_YES:
+CMP BX,YNEW
+jne down_left
+jmp CODE1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+down_left:
+MOV AX,XOLD
+MOV BX,YOLD
+ADD BX,150
+SUB AX,75
+CMP AX,XNEW
+JE down_left_YES
+jne STATIONTOHHERE2
+down_left_YES:
+CMP BX,YNEW
+jne STATIONTOHHERE2
+jmp CODE1
+;===========================================================================================
+;======================================STATIONT(2)============================================
+STATIONTOHHERE2:
+JMP TOHHERE
+STATIONTOCODE2:
+JMP CODE1
+;===========================================================================================
+;==========================STATION1_FOR_NEXT_COMPARSIONS====================================
+STATION1_FOR_NEXT_COMPARSIONS:
+   CMP AL,'K'
+   JE KING 
+ JMP STATION2_FOR_NEXT_COMPARSIONS
+;===========================================================================================
+;;==========================KING============================================================
+KING:
+mov AX,XOLD
+mov BX,YOLD
+ADD AX,75       ;moves to the right
+CMP AX,XNEW
+je XRYES
+jne UPRIGHT
+XRYES:
+CMP BX,YNEW
+jne UPRIGHT
+Jmp CODE1
+;;;;;;;;;;;
+UPRIGHT:
+mov AX,XOLD
+mov BX,YOLD
+SUB BX,75
+ADD Ax,75
+CMP AX,XNEW
+je XURYES
+jne UP
+XURYES:
+CMP BX,YNEW
+jne UP
+jmp CODE1
+;;;;;;;;;;;
+UP:
+mov AX,XOLD
+mov BX,YOLD
+SUB BX,75
+CMP AX,XNEW
+je XUYES
+jne UPLEFT
+XUYES:
+CMP BX,YNEW
+jne UPLEFT
+jmp CODE1
+;;;;;;;;;;
+UPLEFT:
+mov AX,XOLD
+mov BX,YOLD
+SUB AX,75
+SUB BX,75
+CMP AX,XNEW
+je XULYES
+jne LEFT
+XULYES:
+CMP BX,YNEW
+jne LEFT
+jmp CODE1
+;;;;;;;;;;;
+LEFT:
+mov AX,XOLD
+mov BX,YOLD
+SUB AX,75
+CMP AX,XNEW
+je XLYES
+jne DOWNLEFT
+XLYES:
+CMP BX,YNEW
+jne DOWNLEFT
+jmp CODE1
+;;;;;;;;;;;;
+DOWNLEFT:
+mov AX,XOLD
+mov BX,YOLD
+SUB AX,75
+ADD BX,75       
+CMP AX,XNEW
+je XDLYES
+jne DOWN
+XDLYES:
+CMP BX,YNEW
+jne DOWN
+jmp CODE1
+;;;;;;;;;;;;
+DOWN:
+mov AX,XOLD
+mov BX,YOLD
+ADD BX,75       
+CMP AX,XNEW
+je XDYES
+jne DOWNRIGHT
+XDYES:
+CMP BX,YNEW
+jne DOWNRIGHT
+jmp CODE1
+;;;;;;;;;;;;
+DOWNRIGHT:
+mov AX,XOLD
+mov BX,YOLD
+ADD AX,75
+ADD BX,75       
+CMP AX,XNEW
+je XDRYES
+jne STATIONTOHHERE3
+XDRYES:
+CMP BX,YNEW
+jne STATIONTOHHERE3;invalid move
+jmp CODE1
+;===========================================================================================
+;======================================STATIONT(3)============================================
+STATIONTOHHERE3:
+JMP TOHHERE
+STATIONTOCODE3:
+JMP CODE1
+;===========================================================================================
+;==========================STATION2_FOR_NEXT_COMPARSIONS====================================
+STATION2_FOR_NEXT_COMPARSIONS:
+   CMP AL,'P'
+   je POWN
+   JMP CODE1 ;=====****** 
+;===========================================================================================
+;==========================================POWN=============================================
+
+POWN:
+MOV AX,XOLD
+MOV BX,YOLD
+cmp BX,75
+je tow_moves
+;;;;;;
+one_move:
+ADD BX,75
+cmp BX,YNEW
+jne TOHHERE2
+cmp AX,XNEW
+jne check3
+;
+;jne diagonal_mov_positive 
+mov XSTART,AX
+mov YSTART,BX
+call GETPLACE
+mov BX,place
+MOV AL ,state0[BX+2];move odam
+cmp AL,'X'
+je CODE2
+jne TOHHERE2 
+;
+check3:
+cmp AX,XNEW
+jA diagonal_mov_negative
+JL diagonal_mov_positive
+
+diagonal_mov_positive:
+ADD AX,75
+mov XSTART,AX
+mov YSTART,BX
+call GETPLACE
+mov BX,place
+MOV AL ,state0[BX+2]
+cmp AL,'B'
+je CODE2
+jne TOHHERE2
+
+diagonal_mov_negative:
+SUB AX,75
+mov XSTART,AX
+mov YSTART,BX
+call GETPLACE
+mov BX,place
+MOV AL ,state0[BX+2]
+cmp AL,'B'
+je CODE1
+jne TOHHERE2
+;;;;;;;;;;;;;
+CODE2:
+jmp CODE1
+TOHHERE2:
+jmp TOHHERE
 
 
+tow_moves:
+ADD BX,75
+cmp BX,YNEW
+jne another_col
+cmp AX,XNEW
+jne check3
+je check_X
+another_col:
+ADD BX,75
+cmp BX,YNEW
+je check_X
+jne TOHHERE
+check_X:
+cmp AX,XNEW
+jne TOHHERE 
+mov XSTART,AX
+mov YSTART,BX
+call GETPLACE
+mov BX,place
+MOV AL ,state0[BX+2]
+cmp AL,'X'
+je CODE1
+jne TOHHERE
+;===========================================================================================
+;===========================================================================================
 
 
-
-
-
-
-
-
-
-
-;=========================================================================================
+;===========================================================================================
 TOHHERE:
  POP AX
  MOV YSTART,AX
@@ -767,6 +1242,639 @@ CODE1:
     ;;IF IT IS NOT EMPTY WE DO THE FOLLOWING:
        NOTEMPTY1:
    
+   ;;==========================COMPARSIONS==========================================================
+   PUSH XSTARTB
+   PUSH YSTARTB
+   MOV AX,PLACESTORAGEXB   
+   MOV XOLD,AX
+   MOV AX,XSTARTB
+   MOV XNEW,AX 
+   MOV AX,PLACESTORAGEYB
+   MOV YOLD,AX 
+   MOV AX,YSTARTB
+   MOV YNEW,AX
+ ;XOLD ,YOLD ,XNEW ,YNEW
+   MOV AL,SHAPESTORAGEB[1]
+   CMP Al,'S'
+   jE BISHOPB
+   CMP AL,'R'
+   JE TABEAB11
+   CMP AL,'Q'
+   JE QUEENB11
+   JMP  STATION_FOR_NEXT_COMPARSIONSB
+
+
+
+
+; ADD YOUR COMPARSION HERE :
+
+
+
+
+
+   JMP CODEB1B
+;;===============================================================================================
+;==============================================BISHOPB============================================
+  BISHOPB:
+mov ax,XNEW
+mov bx,XOLD
+cmp ax,bx
+jg CHECKB1
+jmp CHECKB2
+CHECKB1:
+mov ax,YNEW
+mov bx,YOLD
+cmp ax,bx
+jg MOVEB1
+jmp MOVEB2
+CHECKB2:
+mov ax,YNEW
+mov bx,YOLD
+cmp ax,bx
+jg MOVEB3
+jmp MOVEB4
+MOVEB1: ;x>,y>
+mov ax,XNEW
+sub ax,XOLD
+mov bx,YNEW
+sub bx,YOLD
+cmp ax,bx
+jz  CHECKBMOVEB1
+jmp InvalidB 
+MOVEB2: ;x>,y<
+mov ax,XNEW
+sub ax,XOLD
+mov bx,YOLD
+sub bx,YNEW
+cmp ax,bx
+jz  CHECKBMOVEB2
+jmp InvalidB   
+TABEAB11:
+JMP TABEAB
+MOVEB3: ;x<,y>
+mov ax,XOLD
+sub ax,XNEW
+mov bx,YNEW
+sub bx,YOLD
+cmp ax,bx
+jz  STATIONTOCHECKBMOVEB3
+jmp InvalidB
+QUEENB11:
+JMP QUEENB
+MOVEB4: ;x<,y<
+mov ax,XOLD
+sub ax,XNEW
+mov bx,YOLD
+sub bx,YNEW
+cmp ax,bx
+jz  STATIONTOCHECKBMOVEB4
+jmp InvalidB
+; -----------------------------------------
+InvalidB:
+ CMP IsQUEENB,1
+ jE TABEAB12
+ JMP HHEREB
+ ;-------------------------------------------
+ ;Loop Till You Reach Destination,Or You Hit A Piece
+ CHECKBMOVEB1:
+ Add XOLD,75
+ Add YOLD,75
+ MOV AX,XNEW
+ cmp AX,XOLD
+ JE GOTOCODEBB
+MOV AX,XOLD
+MOV XSTARTB,AX
+MOV AX,YOLD
+MOV YSTARTB,AX
+CALL GETPLACEB
+MOV BX,PLACEB
+MOV Al,STATE0[BX+2]
+CMP AL,'X'
+JNE FORINVAILDBISHOPB
+JMP CHECKBMOVEB1
+
+        JMP FORBISHOPB
+        STATIONTOCHECKBMOVEB3:   
+        JMP CHECKBMOVEB3
+        FORBISHOPB:
+
+CHECKBMOVEB2:
+ Add XOLD,75
+ SUB YOLD,75
+ MOV AX,XNEW
+ cmp AX,XOLD
+  GOTOCODEBB:
+ JE FORVAILDBISHOPB
+ MOV AX,XOLD
+ MOV XSTARTB,AX
+ MOV AX,YOLD
+ MOV YSTARTB,AX
+ CALL GETPLACEB
+ MOV BX,PLACEB
+ MOV Al,STATE0[BX+2]
+ CMP AL,'X'
+ JNE STATIONTOHHEREB0
+ JMP CHECKBMOVEB2 
+
+TABEAB12:
+JMP TABEAB
+
+         JMP FORBISHOPB1  
+         STATIONTOCHECKBMOVEB4:   
+         JMP CHECKBMOVEB4
+         FORBISHOPB1:
+
+ CHECKBMOVEB3:
+ SUB XOLD,75
+ Add YOLD,75
+ MOV AX,XNEW
+ cmp AX,XOLD
+FORVAILDBISHOPB:
+ JE STATIONTOCODEB0
+ MOV AX,XOLD
+ MOV XSTARTB,AX
+ MOV AX,YOLD
+ MOV YSTARTB,AX
+ CALL GETPLACEB
+ MOV BX,PLACEB
+ MOV Al,STATE0[BX+2]
+ CMP AL,'X'
+FORINVAILDBISHOPB:
+ JNE STATIONTOHHEREB0
+ JMP CHECKBMOVEB3
+
+ CHECKBMOVEB4:
+ SUB XOLD,75
+ SUB YOLD,75
+ MOV AX,XNEW
+ cmp AX,XOLD
+ JE STATIONTOCODEB0
+ MOV AX,XOLD
+ MOV XSTARTB,AX
+ MOV AX,YOLD
+ MOV YSTARTB,AX
+ CALL GETPLACEB
+ MOV BX,PLACEB
+ MOV Al,STATE0[BX+2]
+ CMP AL,'X'
+ JNE STATIONTOHHEREB0
+ JMP CHECKBMOVEB4
+;=========================================================================================
+;=========================================QUEENB===========================================
+QUEENB:
+mov IsQUEENB,1
+JMP BISHOPB
+;=======================================STATION(0)=======================================
+STATIONTOHHEREB0:
+JMP TOHHEREB
+STATIONTOCODEB0:
+JMP CODEB1B
+;=========================================================================================
+
+;=========================================================================================
+;;==========================TABEAB=========================================================
+  TABEAB:
+  MOV AX,YOLD
+  CMP YNEW,AX          
+  JE MOTIONB_XDIR
+  MOV AX,XOLD
+  CMP XNEW,AX
+  JE MOTIONB_YDIR
+  JMP HHEREB
+;==============================================================
+    MOTIONB_XDIR:
+    MOV AX,XOLD
+    CMP XNEW,AX
+    JA MOTIONB_IN_XPOSITIVE
+    JB MOTIONB_IN_XNEGATIVE
+;============================================================== 
+MOTIONB_IN_XPOSITIVE:
+ADD XOLD,75
+MOV BX,XNEW        ; IN +VE DIR
+CMP XOLD,BX
+JE TOCODEB
+MOV AX,XOLD
+MOV XSTARTB,AX
+CALL GETPLACEB
+MOV BX,PLACEB
+MOV AL,STATE0[BX+2]
+CMP AL,'X'
+JNE STATIONTOHHEREB1
+JMP MOTIONB_IN_XPOSITIVE
+;==============================================================
+MOTIONB_IN_XNEGATIVE:
+SUB XOLD,75
+MOV BX,XNEW           ;IN -VE DIR
+CMP XOLD,BX
+TOCODEB:
+JE STATIONTOCODEB1B
+MOV AX,XOLD
+MOV XSTARTB,AX
+CALL GETPLACEB
+MOV BX,PLACEB
+MOV AL,STATE0[BX+2]
+CMP AL,'X'
+JNE STATIONTOHHEREB1
+JMP MOTIONB_IN_XNEGATIVE
+;==============================================================
+MOTIONB_YDIR:
+    MOV AX,YOLD
+    CMP YNEW,AX
+    JA MOTIONB_IN_YPOSITIVE
+    JB MOTIONB_IN_YNEGATIVE
+;==============================================================
+MOTIONB_IN_YPOSITIVE:
+ADD YOLD,75
+MOV BX,YNEW        ; IN +VE DIR
+CMP YOLD,BX
+JE STATIONTOCODEB1B
+MOV AX,YOLD
+MOV YSTARTB,AX
+CALL GETPLACEB
+MOV BX,PLACEB
+MOV AL,STATE0[BX+2]
+CMP AL,'X'
+JNE STATIONTOHHEREB1
+JMP MOTIONB_IN_YPOSITIVE
+;==============================================================
+MOTIONB_IN_YNEGATIVE:
+SUB YOLD,75
+MOV BX,YNEW           ;IN -VE DIR
+CMP YOLD,BX
+JE STATIONTOCODEB1B
+MOV AX,YOLD
+MOV YSTARTB,AX
+CALL GETPLACEB
+MOV BX,PLACEB
+MOV AL,STATE0[BX+2]
+CMP AL,'X'
+JNE STATIONTOHHEREB1
+JMP MOTIONB_IN_YNEGATIVE
+;======================================STATIONT(1)============================================
+STATIONTOHHEREB1:
+JMP TOHHEREB
+STATIONTOCODEB1B:
+JMP CODEB1B
+;==========================STATION_FOR_NEXT_COMPARSIONSB====================================
+STATION_FOR_NEXT_COMPARSIONSB:
+   CMP AL,'H'
+   JE HORSEB 
+   JMP STATION1_FOR_NEXT_COMPARSIONSB
+;===========================================================================================
+;===========================================================================================
+;;==========================HORSEB===========================================================
+HORSEB:
+MOV AX,XOLD
+MOV BX,YOLD
+ADD AX,150 ;rightB DOWNB
+ADD BX,75
+CMP AX,XNEW
+JE  rightB_DOWNB_YESB
+jne rightB_UPB
+rightB_DOWNB_YESB:
+CMP BX,YNEW
+jne rightB_UPB
+jmp CODEB1B
+;;;;;;;;;;;;;;;;;;;;;;;
+rightB_UPB:
+MOV AX,XOLD
+MOV BX,YOLD
+ADD AX,150
+SUB BX,75
+CMP AX,XNEW     ;rightB UPB
+JE rightB_UPB_YESB
+jne leftB_DOWNB
+rightB_UPB_YESB:
+CMP BX,YNEW
+jne leftB_DOWNB
+jmp CODEB1B
+;;;;;;;;;;;;;;;;;;;;;;;;;
+leftB_DOWNB:
+MOV AX,XOLD
+MOV BX,YOLD
+SUB AX,150
+ADD BX,75
+CMP AX,XNEW     ;leftB DOWNB
+JE leftB_DOWNB_YESB
+jne leftB_UPB
+leftB_DOWNB_YESB:
+CMP BX,YNEW
+jne leftB_UPB
+jmp CODEB1B
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+leftB_UPB:
+MOV AX,XOLD
+MOV BX,YOLD
+SUB AX,150
+SUB BX,75       ;leftB UPB
+CMP AX,XNEW
+JE leftB_UPB_YESB
+jne UPB_rgihtB
+leftB_UPB_YESB:
+CMP BX,YNEW
+jne UPB_rgihtB
+jmp CODEB1B
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+UPB_rgihtB:
+MOV AX,XOLD
+MOV BX,YOLD
+SUB BX,150
+ADD AX,75
+CMP AX,XNEW     ;UPB rightB
+JE UPB_rgihtB_YESB
+jne UPB_leftB
+UPB_rgihtB_YESB:
+CMP BX,YNEW
+jne UPB_leftB
+jmp CODEB1B
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+UPB_leftB:
+MOV AX,XOLD
+MOV BX,YOLD
+SUB BX,150
+SUB AX,75
+CMP AX,XNEW     ;UPB leftB
+JE UPB_leftB_YESB
+jne DOWNB_rightB
+UPB_leftB_YESB:
+CMP BX,YNEW
+jne DOWNB_rightB
+jmp CODEB1B
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+DOWNB_rightB:
+MOV AX,XOLD
+MOV BX,YOLD
+ADD BX,150
+ADD AX,75
+CMP AX,XNEW
+JE DOWNB_rightB_YESB
+jne DOWNB_leftB
+DOWNB_rightB_YESB:
+CMP BX,YNEW
+jne DOWNB_leftB
+jmp CODEB1B
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+DOWNB_leftB:
+MOV AX,XOLD
+MOV BX,YOLD
+ADD BX,150
+SUB AX,75
+CMP AX,XNEW
+JE DOWNB_leftB_YESB
+jne STATIONTOHHEREB2
+DOWNB_leftB_YESB:
+CMP BX,YNEW
+jne STATIONTOHHEREB2
+jmp CODEB1B
+;===========================================================================================
+;======================================STATIONT(2)============================================
+STATIONTOHHEREB2:
+JMP TOHHEREB
+STATIONTOCODEB2:
+JMP CODEB1B
+;===========================================================================================
+;==========================STATION1_FOR_NEXT_COMPARSIONSB====================================
+STATION1_FOR_NEXT_COMPARSIONSB:
+   CMP AL,'K'
+   JE KINGB 
+ JMP STATION2_FOR_NEXT_COMPARSIONSB
+;===========================================================================================
+;;==========================KINGB============================================================
+KINGB:
+mov AX,XOLD
+mov BX,YOLD
+ADD AX,75       ;MOVEBs to the rightB
+CMP AX,XNEW
+je XRYESB
+jne UPBrightB
+XRYESB:
+CMP BX,YNEW
+jne UPBrightB
+Jmp CODEB1B
+;;;;;;;;;;;
+UPBrightB:
+mov AX,XOLD
+mov BX,YOLD
+SUB BX,75
+ADD Ax,75
+CMP AX,XNEW
+je XURYESB
+jne UPB
+XURYESB:
+CMP BX,YNEW
+jne UPB
+jmp CODEB1B
+;;;;;;;;;;;
+UPB:
+mov AX,XOLD
+mov BX,YOLD
+SUB BX,75
+CMP AX,XNEW
+je XUYESB
+jne UPBleftB
+XUYESB:
+CMP BX,YNEW
+jne UPBleftB
+jmp CODEB1B
+;;;;;;;;;;
+UPBleftB:
+mov AX,XOLD
+mov BX,YOLD
+SUB AX,75
+SUB BX,75
+CMP AX,XNEW
+je XULYESB
+jne leftB
+XULYESB:
+CMP BX,YNEW
+jne leftB
+jmp CODEB1B
+;;;;;;;;;;;
+leftB:
+mov AX,XOLD
+mov BX,YOLD
+SUB AX,75
+CMP AX,XNEW
+je XLYESB
+jne DOWNBleftB
+XLYESB:
+CMP BX,YNEW
+jne DOWNBleftB
+jmp CODEB1B
+;;;;;;;;;;;;
+DOWNBleftB:
+mov AX,XOLD
+mov BX,YOLD
+SUB AX,75
+ADD BX,75       
+CMP AX,XNEW
+je XDLYESB
+jne DOWNB
+XDLYESB:
+CMP BX,YNEW
+jne DOWNB
+jmp CODEB1B
+;;;;;;;;;;;;
+DOWNB:
+mov AX,XOLD
+mov BX,YOLD
+ADD BX,75       
+CMP AX,XNEW
+je XDYESB
+jne DOWNBrightB
+XDYESB:
+CMP BX,YNEW
+jne DOWNBrightB
+jmp CODEB1B
+;;;;;;;;;;;;
+DOWNBrightB:
+mov AX,XOLD
+mov BX,YOLD
+ADD AX,75
+ADD BX,75       
+CMP AX,XNEW
+je XDRYESB
+jne STATIONTOHHEREB3
+XDRYESB:
+CMP BX,YNEW
+jne STATIONTOHHEREB3;InvalidB MOVEB
+jmp CODEB1B
+;===========================================================================================
+;======================================STATIONT(3)============================================
+STATIONTOHHEREB3:
+JMP TOHHEREB
+STATIONTOCODEB3:
+JMP CODEB1B
+;===========================================================================================
+;==========================STATION2_FOR_NEXT_COMPARSIONSB====================================
+STATION2_FOR_NEXT_COMPARSIONSB:
+   CMP AL,'P'
+   je POWNB
+   JMP CODEB1B ;=====****** 
+;===========================================================================================
+;==========================================POWNB=============================================
+
+POWNB:
+MOV AX,XOLD
+MOV BX,YOLD
+cmp BX,450
+je tow_MOVEBs
+;;;;;;
+one_MOVEB:
+SUB BX,75
+cmp BX,YNEW
+jne TOHHEREB2
+cmp AX,XNEW
+jne CHECKB3
+;
+;jne diagonalB_mov_positive 
+mov XSTARTB,AX
+mov YSTARTB,BX
+call GETPLACEB
+mov BX,PLACEB
+MOV AL ,state0[BX+2];MOVEB odam
+cmp AL,'X'
+je CODEB2
+jne TOHHEREB2 
+;
+CHECKB3:
+cmp AX,XNEW
+jA diagonalB_mov_negative
+JL diagonalB_mov_positive
+
+diagonalB_mov_positive:
+SUB AX,75
+mov XSTARTB,AX
+mov YSTARTB,BX
+call GETPLACEB
+mov BX,PLACEB
+MOV AL ,state0[BX+2]
+cmp AL,'W'
+je CODEB2
+jne TOHHEREB2
+
+diagonalB_mov_negative:
+ADD AX,75
+mov XSTARTB,AX
+mov YSTARTB,BX
+call GETPLACEB
+mov BX,PLACEB
+MOV AL ,state0[BX+2]
+cmp AL,'W'
+je CODEB1B
+jne TOHHEREB2
+;;;;;;;;;;;;;
+CODEB2:
+jmp CODEB1B
+TOHHEREB2:
+jmp TOHHEREB
+
+
+tow_MOVEBs:
+SUB BX,75
+cmp BX,YNEW
+jne anotherB_col
+cmp AX,XNEW
+jne CHECKB3
+je CHECKB_X
+anotherB_col:
+SUB BX,75
+cmp BX,YNEW
+je CHECKB_X
+jne TOHHEREB
+CHECKB_X:
+cmp AX,XNEW
+jne TOHHEREB 
+mov XSTARTB,AX
+mov YSTARTB,BX
+call GETPLACEB
+mov BX,PLACEB
+MOV AL ,state0[BX+2]
+cmp AL,'X'
+je CODEB1B
+jne TOHHEREB
+;===========================================================================================
+;===========================================================================================
+
+
+;===========================================================================================
+TOHHEREB:
+ POP AX
+ MOV YSTARTB,AX
+ POP AX
+ MOV XSTARTB,AX
+JMP JUMPTOHHEREB
+;===========================================================================================
+CODEB1B:
+ POP AX
+ MOV YSTARTB,AX
+ POP AX
+ MOV XSTARTB,AX
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;===================;=;=;========================================
+
+
+
        ;; HERE WE PRINT ON THE NEW CELL
    
        CALL GETPLACEB
@@ -801,7 +1909,7 @@ CODE1:
          JMP GOATB
          
         JUMPTOHHEREB:   
-        JMP HHERE1
+        JMP HHEREB
 
         GOATB:
 
@@ -835,7 +1943,7 @@ CODE1:
         MOV XSTARTB,AX
 
 
-        HHERE1:
+        HHEREB:
         MOV SHAPESTORAGEB[0],'Y'            ;;RETURN THE SHAPE STORAGE EMPTY AGAIN
         MOV SHAPESTORAGEB[1],'Y'     
       JMP CheckKeyPressed
@@ -1024,6 +2132,5 @@ GETPLACEB PROC
 
         ret
 GETPLACEB ENDP
-
 
 END MAIN    
