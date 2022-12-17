@@ -2019,7 +2019,7 @@ CODEB1B:
 
 
 
-       ;; HERE WE PRINT ON THE NEW CELL
+       ;; HERE WE PRINT ON THE NEW CELLv
    
        CALL GETPLACEB
        MOV BX,placeB                                       
