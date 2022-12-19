@@ -42,6 +42,12 @@ YNEW DW 0
 IsQueen DB 0
 IsQUEENB DB 0
 
+;;================
+XKILLED DW 625
+YKILLED DW 0
+;;================
+
+
 imgFilename DB 'G1', 0
 
 
@@ -107,10 +113,30 @@ MAIN PROC FAR
 
   ;//////////////
           mov  AX,4F02h            ;/
-          mov  BX,105h             ;/  graph 800*600  256 colors
+          mov  BX,105h             ;/  graph 1024x768  256 colors
           INT  10h                 ;/
   ;//////////////
+      MOV  imgFilename[0],'M'
+      MOV  imgFilename[1],'O'
+          MOV XSTART, 625
+
+       
+
+BLUELOOPOUTTER:
   
+   BLUELOOPINNER:
+          CALL PRINT
+          ADD YSTART,75
+          CMP YSTART,600        
+  JNE BLUELOOPINNER
+        ADD XSTART,75
+        MOV YSTART,0
+        CMP XSTART,1000
+JNE  BLUELOOPOUTTER
+
+MOV XSTART,0
+MOV YSTART,0
+
 
   ;;; PRINT GRID==============================
 
@@ -1197,7 +1223,9 @@ CODE1:
        PUSH BX
        MOV AL ,state0[BX+2]
        CMP AL,'W'
-       JE JUMPTOHHERE
+        JNE HELLO
+       JMP JUMPTOHHERE
+       HELLO:
        ;;Check if the killed one is king,then the game is over 
        MOV AL , state0[BX+3]
        CMP AL , 'K'
@@ -1210,7 +1238,42 @@ CODE1:
        MOV  imgFilename[1], AH  
        MOV MODE,2
        CALL PRINT
-   
+        
+
+        PUSH XSTART
+        PUSH YSTART
+
+       CALL GETPLACE
+       MOV BX,place  
+        MOV AL,state0 [BX+2] 
+        CMP AL,'X'
+        JE GO_TO_POP  
+       MOV  imgFilename[0], AL 
+       MOV AH, state0[BX+3]               
+       MOV  imgFilename[1], AH 
+       MOV MODE,1
+       MOV AX,XKILLED
+       MOV XSTART,AX
+       MOV AX,YKILLED
+       MOV YSTART,AX
+       CALL PRINT
+       
+       ADD YKILLED,75
+       CMP YKILLED,600
+       JNE GO_TO_POP
+        MOV YKILLED,0
+        ADD XKILLED,75
+
+
+
+
+      GO_TO_POP:
+        POP YSTART
+        POP XSTART
+
+
+
+
        POP BX 
        MOV AL,SHAPESTORAGE[0]
        MOV  imgFilename[0], AL            ;;GET OLD SHAPE AND PRINT IT ON THE NEW CELL
@@ -2026,7 +2089,9 @@ CODEB1B:
        PUSH BX
        MOV AL ,state0[BX+2]
        CMP AL,'B'
-       JE JUMPTOHHEREB
+       JNE HELLOB
+       JMP JUMPTOHHEREB
+       HELLOB:
        ;;Check if the killed one is king,then the game is over 
        MOV AL , state0[BX+3]
        CMP AL , 'K'
@@ -2041,6 +2106,43 @@ CODEB1B:
        CALL PRINTB
    
      
+
+        PUSH XSTARTB
+        PUSH YSTARTB
+
+       CALL GETPLACEB
+       MOV BX,placeB  
+        MOV AL,state0 [BX+2] 
+        CMP AL,'X'
+        JE GO_TO_POPB 
+       MOV  imgFilename[0], AL 
+       MOV AH, state0[BX+3]               
+       MOV  imgFilename[1], AH 
+       MOV MODEB,0
+       MOV AX,XKILLED
+       MOV XSTARTB,AX
+       MOV AX,YKILLED
+       MOV YSTARTB,AX
+       CALL PRINTB
+       
+       ADD YKILLED,75
+       CMP YKILLED,600
+       JNE GO_TO_POPB
+        MOV YKILLED,0
+        ADD XKILLED,75
+
+
+
+
+      GO_TO_POPB:
+        POP YSTARTB
+        POP XSTARTB
+
+
+
+
+
+
        POP BX 
        MOV AL,SHAPESTORAGEB[0]
        MOV  imgFilename[0], AL            ;;GET OLD SHAPE AND PRINT IT ON THE NEW CELL
