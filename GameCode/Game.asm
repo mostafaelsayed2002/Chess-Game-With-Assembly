@@ -33,6 +33,7 @@ columnNo        DB 0
 place           DW 0
 
 placeB           DW 0
+RandomPlace     DW 96              ;;Bonus Random Place ;;Need to generate func for it 
 
 XOLD DW 0
 XNEW DW 0
@@ -534,7 +535,29 @@ JMP NOTEMPTY
 
 
 OUR_LOGIC:
+    
+    ;==================BONUS CHECK RANDOM PLACE==============================
+    MOV BX , PLACE 
+    CMP BX , RandomPlace
+    JNE NOT_THE_BONUS
+    MOV AL,TIME0[BX+2]                     ;Seconds
+    CMP DH,AL 
+    JA DH_IS_GREATER_BONUS 
+    ; If AL IS GREATER
+    SUB AL,DH
+    CMP Al,2
+    JAE FIRSTMOVE_OR_MORE_THAN_3SEC
+    JMP here
+    
+    DH_IS_GREATER_BONUS:
+    SUB DH,AL
+    CMP DH,2
+    JAE FIRSTMOVE_OR_MORE_THAN_3SEC
+    JMP here
 
+
+    ;========================NOT THE BONUS====================================
+    NOT_THE_BONUS:
     MOV AL,TIME0[BX+2]                     ;Seconds
     CMP DH,AL 
     JA DH_IS_GREATER 
