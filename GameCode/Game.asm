@@ -33,6 +33,9 @@ columnNo        DB 0
 place           DW 0
 
 placeB           DW 0
+WAITING_TIME DB 10
+WAITING_TIMEB DB 10
+
 
 XOLD DW 0
 XNEW DW 0
@@ -46,6 +49,12 @@ IsQUEENB DB 0
 XKILLED DW 625
 YKILLED DW 0
 ;;================
+
+
+;;==========
+RANDOMPLACE DW 96 
+
+
 
 
 imgFilename DB 'G1', 0
@@ -85,32 +94,146 @@ STATE7       DB         'G','D','B','R'  ,'G','L','B','H'  ,'G','D','B','S'  ,'G
 
 
 
-TIME0        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+TIME0        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
 
-TIME1        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+TIME1        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
 
-TIME2        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+TIME2        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
 
-TIME3        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+TIME3        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
 
-TIME4        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+TIME4        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
 
-TIME5        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+TIME5        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
 
-TIME6        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+TIME6        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
 
-TIME7        DB         'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X'  ,'X','X','X','X' ,'X','X','X','X'  ,'X','X','X','X'
+TIME7        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
                                   
+ENTERNAME  DB 'PLEASE ENTER YOUR NAME:', 13 ,10 ,'$'
+ENTERKEY  DB 'PLEASE ENTER KEY TO CONTINUE:', 13 ,10 ,'$'
+  InDATA db 30,?,30 dup('$')
 
-  
+
+
+ENTERF1  DB 'TO START CHATING PRESS F1', 13 ,10 ,'$'
+ENTERF2  DB 'TO START THE GAME PRESS F2', 13 ,10 ,'$'
+ENTERESC  DB 'TO END THE PROGRAM PRESS ESC', 13 ,10 ,'$'
+
 
 .CODE
 MAIN PROC FAR
 
           MOV  AX , @DATA
           MOV  DS , AX
+;//////////////////////////////HOME PAGE///////////////////////////
+
+ 
+  mov ax,0600h
+  mov bh,07
+  mov cx,0
+  mov dx,184fh
+  int 10h
+
+mov ah,02
+mov bh,00
+mov dl,0
+mov dh,0
+int 10h
 
 
+MOV DX,OFFSET ENTERNAME
+MOV AH,9
+INT 21h
+
+mov ah,02
+mov bh,00
+mov dl,5
+mov dh,1
+int 10h
+
+
+mov ah,0AH
+mov dx,offset InDATA
+int 21h
+
+mov ah,02
+mov bh,00
+mov dl,0
+mov dh,15
+int 10h
+
+
+MOV DX,OFFSET ENTERKEY
+MOV AH,9
+INT 21h
+
+MOV AH,00
+INT 16H
+
+mov ax,0600h
+mov bh,07
+mov cx,0
+mov dx,184fh
+int 10h
+
+mov ah,02
+mov bh,00
+mov dl,20
+mov dh,10
+int 10h
+
+
+MOV DX,OFFSET ENTERF1
+MOV AH,9
+INT 21h
+
+mov ah,02
+mov bh,00
+mov dl,20
+mov dh,11
+int 10h
+
+MOV DX,OFFSET ENTERF2
+MOV AH,9
+INT 21h
+
+
+mov ah,02
+mov bh,00
+mov dl,20
+mov dh,12
+int 10h
+
+MOV DX,OFFSET ENTERESC
+MOV AH,9
+INT 21h
+
+JJMP:
+MOV AH,00H
+INT 16h
+
+;;CMP AH,3BH
+;;MOVE TO CHATTING
+CMP AH,3CH
+JE GAME
+
+CMP AH,01H
+JNE JJMP
+JMP PRESS_ESC
+
+
+
+ 
+ 
+
+
+
+;///////////////////////////////////////////////////////////////////
+
+
+
+ GAME:
   ;//////////////
           mov  AX,4F02h            ;/
           mov  BX,105h             ;/  graph 1024x768  256 colors
@@ -120,7 +243,10 @@ MAIN PROC FAR
       MOV  imgFilename[1],'O'
           MOV XSTART, 625
 
-       
+
+
+
+
 
 BLUELOOPOUTTER:
   
@@ -286,6 +412,27 @@ MOV YSTART,0
           MOV  YSTARTB,525
           MOV MODEB,1
           CALL PRINTB
+
+
+
+
+
+MOV AH,2
+MOV DH,40
+MOV DL,75
+MOV BH,0
+INT 10h
+
+
+MOV AH,09H
+MOV AL,'A'
+MOV BL,6FH
+MOV BH,0
+MOV CX,1
+
+INT 10h
+
+
 
 ;;==========================================================================
 ;;  THIS PART OF CODE DO 
@@ -535,12 +682,13 @@ JMP NOTEMPTY
 
 OUR_LOGIC:
 
+    
     MOV AL,TIME0[BX+2]                     ;Seconds
     CMP DH,AL 
     JA DH_IS_GREATER 
     ; If AL IS GREATER
     SUB AL,DH
-    CMP Al,3
+    CMP Al,WAITING_TIME
     JAE FIRSTMOVE_OR_MORE_THAN_3SEC
     JMP here
     
@@ -548,7 +696,7 @@ OUR_LOGIC:
 
     DH_IS_GREATER:
     SUB DH,AL
-    CMP DH,3
+    CMP DH,WAITING_TIME
     JAE FIRSTMOVE_OR_MORE_THAN_3SEC
     JMP here
     
@@ -1209,6 +1357,11 @@ CODE1:
    INT 21h                                  ; CH         Hours (BCD)
    CALL GETPLACE                            ; CL         Minutes (BCD)
    MOV BX ,PLACE                            ; DH         Seconds (BCD)
+   ;;=====================bonus 1===================================
+   CMP BX , RANDOMPLACE
+   JNE NOT_THE_POWER_PLACE
+   MOV WAITING_TIME,2
+   NOT_THE_POWER_PLACE:
    MOV TIME0[BX],CH
    MOV TIME0[BX+1],CL 
    MOV TIME0[BX+2],DH
@@ -1406,7 +1559,7 @@ OUR_LOGICB:
     JA DH_IS_GREATERB 
     ; If AL IS GREATERB
     SUB AL,DH
-    CMP Al,3
+    CMP Al,WAITING_TIMEB
     JAE FIRSTMOVEB_OR_MORE_THAN_3SEC
     JMP hereB1
     
@@ -1414,7 +1567,7 @@ OUR_LOGICB:
 
     DH_IS_GREATERB:
     SUB DH,AL
-    CMP DH,3
+    CMP DH,WAITING_TIMEB
     JAE FIRSTMOVEB_OR_MORE_THAN_3SEC
     JMP hereB1
 
