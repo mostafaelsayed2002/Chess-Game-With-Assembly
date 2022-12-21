@@ -33,9 +33,6 @@ columnNo        DB 0
 place           DW 0
 
 placeB           DW 0
-WAITING_TIME DB 10
-WAITING_TIMEB DB 10
-
 
 XOLD DW 0
 XNEW DW 0
@@ -682,7 +679,6 @@ JMP NOTEMPTY
 
 OUR_LOGIC:
 
-    
     MOV AL,TIME0[BX+2]                     ;Seconds
     CMP DH,AL 
     JA DH_IS_GREATER 
