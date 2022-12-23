@@ -46,11 +46,10 @@ IsQUEENB DB 0
 XKILLED DW 625
 YKILLED DW 0
 ;;================
-WAITING_TIME DB 10
-WAITING_TIMEB DB 10
-
+WAITING_TIME DB 1
+WAITING_TIMEB DB 1
 ;;==========
-RANDOMPLACE DW 96 
+RANDOMPLACE DW ?
 
 
 
@@ -110,8 +109,7 @@ TIME7        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X',
                                   
 ENTERNAME  DB 'PLEASE ENTER YOUR NAME:', 13 ,10 ,'$'
 ENTERKEY  DB 'PLEASE ENTER KEY TO CONTINUE:', 13 ,10 ,'$'
-  InDATA db 30,?,30 dup('$')
-
+InDATA db 30,?,30 dup('$')
 
 
 ENTERF1  DB 'TO START CHATING PRESS F1', 13 ,10 ,'$'
@@ -221,16 +219,7 @@ JNE JJMP
 JMP PRESS_ESC
 
 
-
- 
- 
-
-
-
-;///////////////////////////////////////////////////////////////////
-
-
-
+;//////////////////////////////////////////////////////////////////////////////////////////////
  GAME:
   ;//////////////
           mov  AX,4F02h            ;/
@@ -399,14 +388,14 @@ MOV YSTART,0
 ;;PRINT Highlight CELL===================================================
           MOV  imgFilename[0],'F'         
           MOV  imgFilename[1],'R'
-          MOV  XSTART,0             ;PRINT HIGHLIGHT AT THE FIRST CELL
+          MOV  XSTART,0             ;PRINT HIGHLIGHT AT THE FIRST CELL OF FIRST PLAYER
           MOV  YSTART,0
           MOV MODE,1
           CALL PRINT
 ;;PLAYER TWO
           MOV  imgFilename[0],'F'         
           MOV  imgFilename[1],'B'
-          MOV  XSTARTB,525             ;PRINT HIGHLIGHT AT THE FIRST CELL
+          MOV  XSTARTB,525             ;PRINT HIGHLIGHT AT THE FIRST CELL OF SECOND PLAYER
           MOV  YSTARTB,525
           MOV MODEB,1
           CALL PRINTB
@@ -414,23 +403,77 @@ MOV YSTART,0
 
 
 
+;;==========================================================================
+;;                          BONUS 1 
+;;==========================================================================
+        ;===============Generate RandomPlace================
+ PUSH AX
+ PUSH BX
+ PUSH CX 
+ PUSH DX 
 
-MOV AH,2
-MOV DH,40
-MOV DL,75
-MOV BH,0
-INT 10h
+ MOV AH,2ch ;Get Current Time 
+ INT 21h    ; CH=HOUR , CL=MIN , DH = SEC
+ MOV DL,DH 
+ MOV DH ,0
+ MOV AX , 0
+ ADD CL , CH
+ MOV CH,0 
+ ADD AX , CX 
+ ADD AX , DX 
+
+ MOV BL , 31
+ DIV BL    ;AL->TIME/31   , AH->TIME%31
+ MOV AL , AH
+ MOV AH , 0  
+ ADD AX , 16 
+ MOV RANDOMPLACE , AX 
 
 
-MOV AH,09H
-MOV AL,'A'
-MOV BL,6FH
-MOV BH,0
-MOV CX,1
+POP DX 
+POP CX 
+POP BX
+POP AX
 
-INT 10h
+      ;==========Print PowerUp In RandomPlace===============
+PUSH XSTART 
+PUSH YSTART
+PUSH AX 
+PUSH BX 
+
+MOV AX , RANDOMPLACE
+MOV BL , 8
+DIV BL ;AL ->ROW NUMB  ,  AH->COLUM NUMB 
+PUSH AX 
+
+MOV BL , 75
+MUL BL  ;AX->XSTART 
+MOV YSTART,AX
+POP AX 
+MOV AL , AH 
+MOV BL,75
+MUL BL 
+MOV XSTART , AX
+MOV imgFilename[0],'H'
+MOV imgFilename[1],'H'
+MOV MODE,1
+CALL PRINT
+
+;HERE I RETURN RANDOM PLACE TO EQUALISE PLACE BEC RANGE OF PLACE IS MORE THAN 64
+MOV AX,RANDOMPLACE
+MOV BL , 4 
+MUL BL 
+MOV RANDOMPLACE,AX 
+
+ MOV BX , RANDOMPLACE
+ MOV STATE0[BX+2],'H'
+ MOV STATE0[BX+3],'H'
 
 
+POP BX 
+POP AX
+POP YSTART 
+POP XSTART 
 
 ;;==========================================================================
 ;;  THIS PART OF CODE DO 
@@ -630,6 +673,7 @@ INT 10h
        PRESS_ENTER:
        CMP SHAPESTORAGE[0],'Y'    ;CHECK IF IS EMPTY
        JNE BRIDGE_TO_NOTEMPTY
+
 ;;=========================CHECK TIME =======================================  
    PUSH AX 
    PUSH BX 
@@ -643,6 +687,7 @@ INT 10h
    ;Check if it is the first move                             
    CMP AL,'X'    
    JE FIRSTMOVE_OR_MORE_THAN_3SEC
+
    
    MOV AH,CH    ;NEW HOUR IN AH 
    CMP AL,AH     
@@ -668,7 +713,7 @@ INT 10h
       DEC AH 
       CMP AL , AH 
       JNE FIRSTMOVE_OR_MORE_THAN_3SEC
-      JA OUR_LOGIC
+      JMP OUR_LOGIC
 
 
 
@@ -715,7 +760,7 @@ FIRSTMOVE_OR_MORE_THAN_3SEC:
       ;;THEN  GET THE SHAPE WHICH IS WANTED TO MOVE
       ;; AND STORE  IT IN  "SHAPESTORAGE"      
        MOV AL,STATE0[BX+2]
-       CMP AL,'X'          ;;THIS CHECK IF IT IS EMPY CELL AND PLAYER WANT TO MOVE IF WHICH IS FORBIEDDEN                                                  
+       CMP AL,'X'          ;;THIS CHECK IF IT IS EMPY CELL AND PLAYER WANT TO MOVE It WHICH IS FORBIEDDEN                                                  
        JE BRIDGE_TO_here 
        CMP AL,'B'
        JE BRIDGE_TO_here 
@@ -1270,7 +1315,9 @@ mov BX,place
 MOV AL ,state0[BX+2];move odam
 cmp AL,'X'
 je CODE2
-jne TOHHERE2 
+CMP AL ,'H'
+JE CODE2
+JMP TOHHERE2 
 ;
 check3:
 cmp AX,XNEW
@@ -1327,7 +1374,9 @@ mov BX,place
 MOV AL ,state0[BX+2]
 cmp AL,'X'
 je CODE1
-jne TOHHERE
+CMP AL,'H'
+JE CODE1
+JMP TOHHERE
 ;===========================================================================================
 ;===========================================================================================
 
@@ -1373,7 +1422,7 @@ CODE1:
        PUSH BX
        MOV AL ,state0[BX+2]
        CMP AL,'W'
-        JNE HELLO
+       JNE HELLO
        JMP JUMPTOHHERE
        HELLO:
        ;;Check if the killed one is king,then the game is over 
@@ -1384,20 +1433,27 @@ CODE1:
        CON:
        MOV AL,state0 [BX]                 
        MOV  imgFilename[0], AL 
-       MOV AH, state0[BX+1]          ;printing the background  OF THE NEW CELL  TO DELETE THE ANIMY SHAPE IF EXSITS          
+       MOV AH, state0[BX+1]          ;printing the background OF THE NEW CELL  TO DELETE THE ANIMY SHAPE IF EXSITS          
        MOV  imgFilename[1], AH  
        MOV MODE,2
        CALL PRINT
-        
 
         PUSH XSTART
         PUSH YSTART
+       
+       ;;Here If i killed the PowerUp , i dont need to print it 
+        CALL GETPLACE
+       MOV BX,place 
+       MOV AL , state0 [BX+2] 
+       CMP AL , 'H'
+       JE ITS_THE_POWER_UP
+        
 
        CALL GETPLACE
        MOV BX,place  
         MOV AL,state0 [BX+2] 
         CMP AL,'X'
-        JE GO_TO_POP  
+        JE GO_TO_POP 
        MOV  imgFilename[0], AL 
        MOV AH, state0[BX+3]               
        MOV  imgFilename[1], AH 
@@ -1414,6 +1470,14 @@ CODE1:
         MOV YKILLED,0
         ADD XKILLED,75
 
+     
+JMP GO_TO_POP
+
+ITS_THE_POWER_UP:
+MOV BX , RANDOMPLACE
+MOV STATE0[BX+2],'X'
+MOV STATE0[BX+3],'X'
+MOV RANDOMPLACE,1000
 
 
 
@@ -1425,6 +1489,7 @@ CODE1:
 
 
        POP BX 
+
        MOV AL,SHAPESTORAGE[0]
        MOV  imgFilename[0], AL            ;;GET OLD SHAPE AND PRINT IT ON THE NEW CELL
        MOV STATE0[BX+2],AL                                        
@@ -1435,7 +1500,7 @@ CODE1:
        CALL PRINT
        MOV  imgFilename[0],'F'         
        MOV  imgFilename[1],'R'    ;PRINT HIGHLIGHT AT THE FIRST CELL
-          MOV MODE,1
+       MOV MODE,1
        CALL PRINT                            
                          
       
@@ -1507,7 +1572,7 @@ CODE1:
    PUSH CX 
    PUSH DX
    MOV AH,2ch ;11:39:00
-   INT 21h                               ; CH         Hours (BCD)
+   INT 21h                                   ; CH         Hours (BCD)
    CALL GETPLACEB                            ; CL         Minutes (BCD)
    MOV BX ,PLACEB                            ; DH         Seconds (BCD)
    MOV AL,TIME0[BX]
@@ -1539,7 +1604,7 @@ CODE1:
       DEC AH 
       CMP AL , AH 
       JNE FIRSTMOVEB_OR_MORE_THAN_3SEC
-      JA OUR_LOGICB
+      JMP OUR_LOGICB
 
 
 
@@ -2135,7 +2200,9 @@ mov BX,PLACEB
 MOV AL ,state0[BX+2];MOVEB odam
 cmp AL,'X'
 je CODEB2
-jne TOHHEREB2 
+CMP AL ,'H'
+JE CODEB2
+JMP TOHHEREB2 
 ;
 CHECKB3:
 cmp AX,XNEW
@@ -2143,7 +2210,7 @@ jA diagonalB_mov_negative
 JL diagonalB_mov_positive
 
 diagonalB_mov_positive:
-SUB AX,75
+ADD AX,75
 mov XSTARTB,AX
 mov YSTARTB,BX
 call GETPLACEB
@@ -2154,7 +2221,7 @@ je CODEB2
 jne TOHHEREB2
 
 diagonalB_mov_negative:
-ADD AX,75
+SUB AX,75
 mov XSTARTB,AX
 mov YSTARTB,BX
 call GETPLACEB
@@ -2192,7 +2259,9 @@ mov BX,PLACEB
 MOV AL ,state0[BX+2]
 cmp AL,'X'
 je CODEB1B
-jne TOHHEREB
+cmp AL,'H'
+je CODEB1B
+JMP TOHHEREB
 ;===========================================================================================
 ;===========================================================================================
 
@@ -2220,6 +2289,11 @@ CODEB1B:
    INT 21h                                  ; CH         Hours (BCD)
    CALL GETPLACEB                            ; CL         Minutes (BCD)
    MOV BX ,PLACEB                            ; DH         Seconds (BCD)
+    ;;=====================bonus 1 FOR PLAYER 2===================================
+   CMP BX , RANDOMPLACE
+   JNE NOT_THE_POWER_PLACEB
+   MOV WAITING_TIMEB,2
+   NOT_THE_POWER_PLACEB:
    MOV TIME0[BX],CH
    MOV TIME0[BX+1],CL 
    MOV TIME0[BX+2],DH
@@ -2228,9 +2302,7 @@ CODEB1B:
    POP BX 
    POP AX 
 ;;==================================================================
-;===================;=;=;========================================
-
-
+;===================;=;=;===========================================
 
        ;; HERE WE PRINT ON THE NEW CELLv
    
@@ -2255,10 +2327,16 @@ CODEB1B:
        MOV MODEB,2
        CALL PRINTB
    
-     
 
         PUSH XSTARTB
         PUSH YSTARTB
+       
+       ;;Here If i killed the PowerUp , i dont need to print it 
+        CALL GETPLACEB
+       MOV BX,placeB 
+       MOV AL , state0 [BX+2] 
+       CMP AL , 'H'
+       JE GO_TO_POPB
 
        CALL GETPLACEB
        MOV BX,placeB  
@@ -2281,17 +2359,9 @@ CODEB1B:
         MOV YKILLED,0
         ADD XKILLED,75
 
-
-
-
       GO_TO_POPB:
         POP YSTARTB
         POP XSTARTB
-
-
-
-
-
 
        POP BX 
        MOV AL,SHAPESTORAGEB[0]
