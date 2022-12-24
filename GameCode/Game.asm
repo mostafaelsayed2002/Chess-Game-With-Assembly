@@ -796,7 +796,7 @@ FIRSTMOVE_OR_MORE_THAN_3SEC:
    JMP here
 ;;=========================================================================
 MOVESOFTABEA:
-  ;;==========================TABEA=========================================================
+;;==========================TABEA=========================================================
 
 ;============================================================== 
 ;;MOTION_IN_XPOSITIVE:
@@ -812,7 +812,7 @@ CMP STATE0[BX+2],'W'
 JE  GO_TO_XNEGATIVE
 
 XOR TIME0[BX+3],00000010B
-MOV imgFilename[0],'F'
+MOV imgFilename[0],'D'
 MOV imgFilename[1],'R'
 MOV MODE ,1
 CALL PRINT
@@ -839,7 +839,7 @@ CMP STATE0[BX+2],'W'
 JE  GO_TO_UP
 
 XOR TIME0[BX+3],00000010B
-MOV imgFilename[0],'F'
+MOV imgFilename[0],'D'
 MOV imgFilename[1],'R'
 MOV MODE ,1
 CALL PRINT
@@ -868,7 +868,7 @@ CMP STATE0[BX+2],'W'
 JE  GO_TO_DOWN
 
 XOR TIME0[BX+3],00000010B
-MOV imgFilename[0],'F'
+MOV imgFilename[0],'D'
 MOV imgFilename[1],'R'
 MOV MODE ,1
 CALL PRINT
@@ -895,7 +895,7 @@ CMP STATE0[BX+2],'W'
 JE  FINSH_TABEA
 
 XOR TIME0[BX+3],00000010B
-MOV imgFilename[0],'F'
+MOV imgFilename[0],'D'
 MOV imgFilename[1],'R'
 MOV MODE ,1
 CALL PRINT
@@ -916,6 +916,59 @@ JMP here
 ;;=========================================================================
 ;;=========================================================================
        NOTEMPTY:
+;;=========================================================================
+;;=========Remove Highlight of possible moves==============================
+;;=========================================================================
+        MOV BX , 0 
+Loop_On_Time0_Elemnts:
+        PUSH XSTART 
+        PUSH YSTART 
+        PUSH BX
+        CMP TIME0[BX+3] ,2
+        JE REMOVE_WHITE_POSSIBLE_HIGHLIGHT
+        CMP TIME0[BX+3],3
+        JE REMOVE_WHITE_POSSIBLE_HIGHLIGHT
+        JMP CHECK_END_OF_ELEMENTS
+        REMOVE_WHITE_POSSIBLE_HIGHLIGHT:
+        XOR TIME0[BX+3],00000010B
+        ;;=================Get XSTART AND YSTART From BX=============
+
+MOV AX , BX
+MOV BL , 4
+DIV BL ;AL -> (Row*8 + Col) 
+MOV AH,0 
+MOV BL , 8 
+DIV BL ; AL->ROW AH3->COL
+
+PUSH AX 
+MOV BL , 75
+MUL BL  ;AX->XSTART 
+MOV YSTART,AX
+POP AX 
+MOV AL , AH 
+MOV BL,75
+MUL BL 
+MOV XSTART , AX
+CALL PrintInState
+
+
+
+        CHECK_END_OF_ELEMENTS:
+        POP BX
+        POP YSTART
+        POP XSTART
+        ADD BX , 4 
+        CMP BX , 252 ;;Check This Number
+        JBE Loop_On_Time0_Elemnts
+
+
+
+;;=========================================================================
+;;=========================================================================
+;;=========================================================================
+;;=========================================================================
+
+
        ;; HERE WE PRINT ON THE NEW CELL
 ;;==========================COMPARSIONS==========================================================
    PUSH XSTART
@@ -2603,31 +2656,31 @@ PrintInState PROC       ;prints the square in 'place'
         CALL PRINT
        
         MOV BX,place            
-        MOV AL,TIME0 [BX+3] 
+        MOV AL,TIME0[BX+3] 
         CMP AL,1
         JNE IF_2        
         MOV  imgFilename[0],'F'        
         MOV  imgFilename[1],'B' 
         MOV MODE,1
         CALL PRINT
-    JMP CONT
+        JMP CONT
         IF_2:
         CMP AL,2
         JNE IF_3 
-        MOV  imgFilename[0],'F'        
+        MOV  imgFilename[0],'D'        
         MOV  imgFilename[1],'R' 
         MOV MODE,1
         CALL PRINT
-    JMP CONT 
-       IF_3:
-       CMP AL,3
+        JMP CONT 
+        IF_3:
+        CMP AL,3
         JNE CONT 
-        MOV  imgFilename[0],'F'        
+        MOV  imgFilename[0],'D'        
         MOV  imgFilename[1],'R' 
         MOV MODE,1
         CALL PRINT
-        MOV  imgFilename[0],'F'        
-        MOV  imgFilename[1],'B' 
+        MOV  imgFilename[0],'D'        
+        MOV  imgFilename[1],'R' 
         MOV MODE,1
         CALL PRINT
 
