@@ -46,8 +46,8 @@ IsQUEENB DB 0
 XKILLED DW 625
 YKILLED DW 0
 ;;================
-WAITING_TIME DB 1
-WAITING_TIMEB DB 1
+WAITING_TIME DB 3
+WAITING_TIMEB DB 3
 ;;==========
 RANDOMPLACE DW ?
 
@@ -774,14 +774,149 @@ FIRSTMOVE_OR_MORE_THAN_3SEC:
        MOV PLACESTORAGEX,AX
        MOV AX,YSTART                         
        MOV PLACESTORAGEY,AX                    
-       JMP CheckKeyPressed
- 
+       JMP COMPARSIONS
        BRIDGE_TO_here:
        JMP here 
+       
     ;;IF IT IS NOT EMPTY WE DO THE FOLLOWING:
+    
+;;=========================================================================
+;;=====================HIGHLIGHT OF POSSIBLE MOVES=========================
+;;=========================================================================
+;;=========================================================================
+;;==========================COMPARSIONS FOR SHAPE==========================
+  COMPARSIONS:
+
+   PUSH XSTART
+   PUSH YSTART
+   
+   MOV AL,SHAPESTORAGE[1]
+   CMP Al,'R'
+   JE MOVESOFTABEA
+   JMP here
+;;=========================================================================
+MOVESOFTABEA:
+  ;;==========================TABEA=========================================================
+
+;============================================================== 
+;;MOTION_IN_XPOSITIVE:
+
+MOTION_IN_XPOSITIVE_MOVES:
+
+ADD XSTART,75
+CMP XSTART,600
+JE GO_TO_XNEGATIVE
+CALL GETPLACE
+MOV BX,PLACE
+CMP STATE0[BX+2],'W'
+JE  GO_TO_XNEGATIVE
+
+XOR TIME0[BX+3],00000010B
+MOV imgFilename[0],'F'
+MOV imgFilename[1],'R'
+MOV MODE ,1
+CALL PRINT
+MOV BX,PLACE
+CMP STATE0[BX+2],'B'
+JE GO_TO_XNEGATIVE
+
+JMP MOTION_IN_XPOSITIVE_MOVES
+
+GO_TO_XNEGATIVE:
+POP YSTART
+POP XSTART
+PUSH XSTART
+PUSH YSTART
+
+MOTION_IN_XNEGATIVE_MOVES:
+
+SUB XSTART,75
+CMP XSTART,-75
+JE GO_TO_UP
+CALL GETPLACE
+MOV BX,PLACE
+CMP STATE0[BX+2],'W'
+JE  GO_TO_UP
+
+XOR TIME0[BX+3],00000010B
+MOV imgFilename[0],'F'
+MOV imgFilename[1],'R'
+MOV MODE ,1
+CALL PRINT
+MOV BX,PLACE
+CMP STATE0[BX+2],'B'
+JE GO_TO_UP
+
+JMP MOTION_IN_XNEGATIVE_MOVES
+
+
+GO_TO_UP:
+POP YSTART
+POP XSTART
+PUSH XSTART
+PUSH YSTART
+
+
+MOTION_IN_UP_MOVES:
+
+SUB YSTART,75
+CMP YSTART,-75
+JE GO_TO_DOWN
+CALL GETPLACE
+MOV BX,PLACE
+CMP STATE0[BX+2],'W'
+JE  GO_TO_DOWN
+
+XOR TIME0[BX+3],00000010B
+MOV imgFilename[0],'F'
+MOV imgFilename[1],'R'
+MOV MODE ,1
+CALL PRINT
+MOV BX,PLACE
+CMP STATE0[BX+2],'B'
+JE GO_TO_DOWN
+
+JMP MOTION_IN_UP_MOVES
+
+GO_TO_DOWN:
+POP YSTART
+POP XSTART
+PUSH XSTART
+PUSH YSTART
+
+MOTION_IN_DOWN_MOVES:
+
+ADD YSTART,75
+CMP YSTART,600
+JE FINSH_TABEA
+CALL GETPLACE
+MOV BX,PLACE
+CMP STATE0[BX+2],'W'
+JE  FINSH_TABEA
+
+XOR TIME0[BX+3],00000010B
+MOV imgFilename[0],'F'
+MOV imgFilename[1],'R'
+MOV MODE ,1
+CALL PRINT
+MOV BX,PLACE
+CMP STATE0[BX+2],'B'
+JE FINSH_TABEA
+
+JMP MOTION_IN_DOWN_MOVES
+
+FINSH_TABEA:
+POP YSTART
+POP XSTART
+
+JMP here 
+
+;;=========================================================================
+;;=========================================================================
+;;=========================================================================
+;;=========================================================================
        NOTEMPTY:
        ;; HERE WE PRINT ON THE NEW CELL
-   
 ;;==========================COMPARSIONS==========================================================
    PUSH XSTART
    PUSH YSTART
@@ -2467,6 +2602,39 @@ PrintInState PROC       ;prints the square in 'place'
         MOV MODE,2
         CALL PRINT
        
+        MOV BX,place            
+        MOV AL,TIME0 [BX+3] 
+        CMP AL,1
+        JNE IF_2        
+        MOV  imgFilename[0],'F'        
+        MOV  imgFilename[1],'B' 
+        MOV MODE,1
+        CALL PRINT
+    JMP CONT
+        IF_2:
+        CMP AL,2
+        JNE IF_3 
+        MOV  imgFilename[0],'F'        
+        MOV  imgFilename[1],'R' 
+        MOV MODE,1
+        CALL PRINT
+    JMP CONT 
+       IF_3:
+       CMP AL,3
+        JNE CONT 
+        MOV  imgFilename[0],'F'        
+        MOV  imgFilename[1],'R' 
+        MOV MODE,1
+        CALL PRINT
+        MOV  imgFilename[0],'F'        
+        MOV  imgFilename[1],'B' 
+        MOV MODE,1
+        CALL PRINT
+
+
+
+      CONT:
+
         MOV BX,place                               
         MOV AL,state0 [BX+2]     
         MOV  imgFilename[0], AL       ;printing the PICE                   
