@@ -124,9 +124,7 @@ OpenFile PROC
               MOV  AL, 0                    ; read only
               LEA  DX,imgFilename
               INT  21h
-    ; you should check carry flag to make sure it worked correctly
-    ; carry = 0 -> successful , file handle -> AX
-    ; carry = 1 -> failed , AX -> error code
+ 
               MOV  [imgFilehandle], AX
               RET
 
