@@ -47,7 +47,7 @@ RANDOMPLACE DW ?
 THISISAQUEEN DB 0
 ;===================
 KINGPLACEX DW 300
-KINGPLACEY DW 0
+KINGPLACEY DW 525
 
 CHECKPLACEX DW 0
 CHECKPLACEY DW 0
@@ -1529,7 +1529,7 @@ CMP STATE0[BX+2],'B'
 JE EATLEFT_MOVE
 CMP STATE0[BX+2],'W'             ;;EATLEFT
 JNE EATLEFT_MOVE
-XOR TIME0[BX+3],00000001B
+XOR TIME0[BX+3],00000010B
 MOV imgFilename[0],'D'
 MOV imgFilename[1],'R'
 MOV MODE ,1
@@ -1554,7 +1554,7 @@ CMP STATE0[BX+2],'B'
 JE FIRST_MOVE
 CMP STATE0[BX+2],'W'
 JNE FIRST_MOVE
-XOR TIME0[BX+3],00000001B
+XOR TIME0[BX+3],00000010B
 MOV imgFilename[0],'D'
 MOV imgFilename[1],'R'
 MOV MODE ,1
@@ -1576,7 +1576,7 @@ CMP STATE0[BX+2],'B'
 JE ENDPOWN
 CMP STATE0[BX+2],'W'
 JE ENDPOWN
-XOR TIME0[BX+3],00000001B
+XOR TIME0[BX+3],00000010B
 MOV imgFilename[0],'D'
 MOV imgFilename[1],'R'
 MOV MODE ,1
@@ -1594,7 +1594,7 @@ JE ENDOF_POWN
 CMP STATE0[BX+2],'W'
 ENDPOWN:
 JE ENDOF_POWN
-XOR TIME0[BX+3],00000001B
+XOR TIME0[BX+3],00000010B
 MOV imgFilename[0],'D'
 MOV imgFilename[1],'R'
 MOV MODE ,1
@@ -1615,7 +1615,7 @@ CMP STATE0[BX+2],'B'
 JE ENDOF_POWN
 CMP STATE0[BX+2],'W'
 JE ENDOF_POWN
-XOR TIME0[BX+3],00000001B
+XOR TIME0[BX+3],00000010B
 MOV imgFilename[0],'D'
 MOV imgFilename[1],'R'
 MOV MODE ,1
@@ -2398,7 +2398,7 @@ CODE1:
        MOV  imgFilename[0], AL 
        MOV AH, state0[BX+3]               
        MOV  imgFilename[1], AH 
-       MOV MODE,1
+       MOV MODE,0
        MOV AX,XKILLED
        MOV XSTART,AX
        MOV AX,YKILLED
@@ -2448,10 +2448,10 @@ MOV AX,YSTART
 MOV KINGPLACEY,AX
 NOT_KING:
 ;===================================================
-       MOV MODE ,0
+       MOV MODE ,1
        CALL PRINT
        MOV  imgFilename[0],'F'         
-       MOV  imgFilename[1],'R'    ;PRINT HIGHLIGHT AT THE FIRST CELL
+       MOV  imgFilename[1],'B'    ;PRINT HIGHLIGHT AT THE FIRST CELL
        MOV MODE,1
        CALL PRINT                            
                          
@@ -2523,7 +2523,7 @@ NOT_KING:
             out dx , al 
 
    AGAINSEND: 
-
+CALL CHECKKING
 
         HHERE:
         MOV SHAPESTORAGE[0],'Y'            ;;RETURN THE SHAPE STORAGE EMPTY AGAIN
@@ -3464,7 +3464,7 @@ PUSH YSTART
        MOV XSTART,AX
        MOV AX,YKILLED
        MOV YSTART,AX
-       MOV MODE,0
+       MOV MODE,1
        CALL PRINT
        ADD YKILLED,75
        CMP YKILLED,600
@@ -3505,6 +3505,9 @@ MOV BX,AX
 
 POP YSTART
 POP XSTART
+
+
+CALL CHECKKING
 
         ret
 MOVE ENDP

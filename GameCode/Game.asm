@@ -2521,6 +2521,7 @@ NOT_KING:
 
    AGAINSEND: 
 
+         CALL CHECKKING
 
         HHERE:
         MOV SHAPESTORAGE[0],'Y'            ;;RETURN THE SHAPE STORAGE EMPTY AGAIN
@@ -3494,12 +3495,13 @@ MOV BX,AX
     MOV  imgFilename[0], AL 
     MOV AL, state0[BX+3]          ; PRINT THE RES MOVE
     MOV  imgFilename[1], AL
-    MOV MODE,0
+    MOV MODE,1
     CALL PRINT
 
 POP YSTART
 POP XSTART
 
+CALL CHECKKING
         ret
 MOVE ENDP
 
