@@ -2523,7 +2523,8 @@ NOT_KING:
             out dx , al 
 
    AGAINSEND: 
-CALL CHECKKING
+
+  CALL CHECKKING
 
         HHERE:
         MOV SHAPESTORAGE[0],'Y'            ;;RETURN THE SHAPE STORAGE EMPTY AGAIN
@@ -2657,6 +2658,163 @@ GETPLACE PROC
         ret
 GETPLACE ENDP
 
+
+MOVE PROC  
+
+;;PLACEOLD  PLACENEW        
+PUSH XSTART
+PUSH YSTART
+
+MOV AX,0
+MOV AL,PLACEOLD
+
+;=======================================================
+MOV BL,4
+DIV BL
+MOV AH,0
+MOV BL , 8
+DIV BL ;AL ->ROW NUMB  ,  AH->COLUM NUMB 
+PUSH AX 
+
+MOV BL , 75
+MUL BL  ;AX->XSTART 
+MOV YSTART,AX
+POP AX 
+MOV AL , AH 
+MOV BL,75
+MUL BL 
+MOV XSTART , AX
+;=======================================================
+
+MOV AX,0
+MOV AL,PLACEOLD
+MOV BX,AX
+
+    MOV AL,state0 [BX]                 
+    MOV  imgFilename[0], AL 
+    MOV AL, state0[BX+1]          ;printing the background OF THE OLD PLACE SO THE OLD SHAPE ID DISAPPERED
+    MOV  imgFilename[1], AL
+    MOV MODE,2
+    CALL PRINT
+    MOV AX,0
+MOV AL,PLACEOLD
+MOV BX,AX
+  
+    MOV AL, STATE0[BX+2]    
+    MOV TEMPSHAPEF,AL
+    MOV AL, STATE0[BX+3]
+    MOV TEMPSHAPES,AL
+
+    MOV STATE0[BX+2],'X'       ;;UPDATE THE STATE ARRAY
+    MOV STATE0[BX+3],'X'
+  
+;=======================================================
+
+
+MOV AX,0
+MOV AL,PLACENEW
+
+MOV BL,4
+DIV BL
+MOV AH,0
+MOV BL , 8
+DIV BL ;AL ->ROW NUMB  ,  AH->COLUM NUMB 
+PUSH AX 
+
+MOV BL , 75
+MUL BL  ;AX->XSTART 
+MOV YSTART,AX
+POP AX 
+MOV AL , AH 
+MOV BL,75
+MUL BL 
+MOV XSTART , AX
+
+
+MOV AX,0
+MOV AL,PLACENEW
+MOV BX,AX
+
+    MOV AL,state0 [BX]                 
+    MOV  imgFilename[0], AL 
+    MOV AL, state0[BX+1]          ;printing the background 
+    MOV  imgFilename[1], AL
+    MOV MODE,2
+    CALL PRINT
+
+MOV AX,0
+MOV AL,PLACENEW
+MOV BX,AX
+
+
+PUSH XSTART
+PUSH YSTART
+
+        MOV AL,state0 [BX+2] 
+        CMP AL,'X'
+        JE NOTX
+     
+       MOV  imgFilename[0], AL 
+       MOV AH, state0[BX+3]               
+       MOV  imgFilename[1], AH 
+       MOV AX,XKILLED
+       MOV XSTART,AX
+       MOV AX,YKILLED
+       MOV YSTART,AX
+       MOV MODE,1
+       CALL PRINT
+       ADD YKILLED,75
+       CMP YKILLED,600
+       JNE NOTX
+        MOV YKILLED,0
+        ADD XKILLED,75
+
+
+NOTX:
+
+POP YSTART
+POP XSTART
+
+
+MOV AX,0
+MOV AL,PLACENEW
+MOV BX,AX
+
+  
+    MOV AL,TEMPSHAPEF
+    MOV STATE0[BX+2],AL       ;;UPDATE THE STATE ARRAY
+    MOV AL,TEMPSHAPES
+    MOV STATE0[BX+3],AL
+ 
+MOV AX,0
+MOV AL,PLACENEW
+MOV BX,AX
+
+    MOV AL,state0 [BX+2]                 
+    MOV  imgFilename[0], AL 
+    MOV AL, state0[BX+3]          ; PRINT THE RES MOVE
+    MOV  imgFilename[1], AL
+    MOV MODE,0
+    CALL PRINT
+
+
+
+
+POP YSTART
+POP XSTART
+
+
+CALL CHECKKING
+
+        ret
+MOVE ENDP
+
+
+
+
+
+
+
 CHECKKING PROC  
 
 PUSH XSTART
@@ -2671,11 +2829,11 @@ PUSH KINGPLACEY
 
 
 ADD KINGPLACEX,75
-ADD KINGPLACEY,75
+SUB KINGPLACEY,75
 CMP KINGPLACEX,525
 JA  CHECKIFTHERE_POWN
-CMP KINGPLACEY,525
-JA  CHECKIFTHERE_POWN
+CMP KINGPLACEY,0
+JL  CHECKIFTHERE_POWN
 MOV AX,KINGPLACEX
 MOV XSTART,AX
 MOV AX,KINGPLACEY
@@ -2700,11 +2858,11 @@ PUSH KINGPLACEX
 PUSH KINGPLACEY
 
 SUB KINGPLACEX,75
-ADD KINGPLACEY,75
+SUB KINGPLACEY,75
 CMP KINGPLACEX,0
 JL  CHECKIFTHERE_H
-CMP KINGPLACEY,525
-JA  CHECKIFTHERE_H
+CMP KINGPLACEY,0
+JL  CHECKIFTHERE_H
 MOV AX,KINGPLACEX
 MOV XSTART,AX
 MOV AX,KINGPLACEY
@@ -3120,7 +3278,7 @@ JNE MOTION_IN_DOWN_MOVES_CHECK
 CMP STATE0[BX+3],'R'
 JNE MOTION_IN_DOWN_MOVES_CHECK
 JE PRINT_CHECK_LABEL3
-CMP STATE0[BX+2],'W'
+CMP STATE0[BX+2],'B'
 JNE MOTION_IN_DOWN_MOVES_CHECK
 CMP STATE0[BX+3],'Q'
 JNE MOTION_IN_DOWN_MOVES_CHECK
@@ -3343,8 +3501,18 @@ MOV imgFilename[1],'K'
 MOV MODE ,0
 CALL PRINT
 
-
+JMP NOTFOUND
 NO_CHECK:
+
+
+MOV XSTART,620
+MOV YSTART,620
+MOV imgFilename[0],'M'
+MOV imgFilename[1],'M'
+MOV MODE ,1
+CALL PRINT
+
+NOTFOUND:
 
 POP KINGPLACEY
 POP KINGPLACEX
@@ -3355,162 +3523,6 @@ POP XSTART
 
         ret
 CHECKKING ENDP
-
-
-
-
-
-
-
-MOVE PROC  
-
-;;PLACEOLD  PLACENEW        
-PUSH XSTART
-PUSH YSTART
-
-MOV AX,0
-MOV AL,PLACEOLD
-
-;=======================================================
-MOV BL,4
-DIV BL
-MOV AH,0
-MOV BL , 8
-DIV BL ;AL ->ROW NUMB  ,  AH->COLUM NUMB 
-PUSH AX 
-
-MOV BL , 75
-MUL BL  ;AX->XSTART 
-MOV YSTART,AX
-POP AX 
-MOV AL , AH 
-MOV BL,75
-MUL BL 
-MOV XSTART , AX
-;=======================================================
-
-MOV AX,0
-MOV AL,PLACEOLD
-MOV BX,AX
-
-    MOV AL,state0 [BX]                 
-    MOV  imgFilename[0], AL 
-    MOV AL, state0[BX+1]          ;printing the background OF THE OLD PLACE SO THE OLD SHAPE ID DISAPPERED
-    MOV  imgFilename[1], AL
-    MOV MODE,2
-    CALL PRINT
-    MOV AX,0
-MOV AL,PLACEOLD
-MOV BX,AX
-  
-    MOV AL, STATE0[BX+2]    
-    MOV TEMPSHAPEF,AL
-    MOV AL, STATE0[BX+3]
-    MOV TEMPSHAPES,AL
-
-    MOV STATE0[BX+2],'X'       ;;UPDATE THE STATE ARRAY
-    MOV STATE0[BX+3],'X'
-  
-;=======================================================
-
-
-MOV AX,0
-MOV AL,PLACENEW
-
-MOV BL,4
-DIV BL
-MOV AH,0
-MOV BL , 8
-DIV BL ;AL ->ROW NUMB  ,  AH->COLUM NUMB 
-PUSH AX 
-
-MOV BL , 75
-MUL BL  ;AX->XSTART 
-MOV YSTART,AX
-POP AX 
-MOV AL , AH 
-MOV BL,75
-MUL BL 
-MOV XSTART , AX
-
-
-MOV AX,0
-MOV AL,PLACENEW
-MOV BX,AX
-
-    MOV AL,state0 [BX]                 
-    MOV  imgFilename[0], AL 
-    MOV AL, state0[BX+1]          ;printing the background 
-    MOV  imgFilename[1], AL
-    MOV MODE,2
-    CALL PRINT
-
-MOV AX,0
-MOV AL,PLACENEW
-MOV BX,AX
-
-
-PUSH XSTART
-PUSH YSTART
-
-        MOV AL,state0 [BX+2] 
-        CMP AL,'X'
-        JE NOTX
-     
-       MOV  imgFilename[0], AL 
-       MOV AH, state0[BX+3]               
-       MOV  imgFilename[1], AH 
-       MOV AX,XKILLED
-       MOV XSTART,AX
-       MOV AX,YKILLED
-       MOV YSTART,AX
-       MOV MODE,1
-       CALL PRINT
-       ADD YKILLED,75
-       CMP YKILLED,600
-       JNE NOTX
-        MOV YKILLED,0
-        ADD XKILLED,75
-
-
-NOTX:
-
-POP YSTART
-POP XSTART
-
-
-MOV AX,0
-MOV AL,PLACENEW
-MOV BX,AX
-
-  
-    MOV AL,TEMPSHAPEF
-    MOV STATE0[BX+2],AL       ;;UPDATE THE STATE ARRAY
-    MOV AL,TEMPSHAPES
-    MOV STATE0[BX+3],AL
- 
-MOV AX,0
-MOV AL,PLACENEW
-MOV BX,AX
-
-    MOV AL,state0 [BX+2]                 
-    MOV  imgFilename[0], AL 
-    MOV AL, state0[BX+3]          ; PRINT THE RES MOVE
-    MOV  imgFilename[1], AL
-    MOV MODE,0
-    CALL PRINT
-
-
-
-
-POP YSTART
-POP XSTART
-
-
-CALL CHECKKING
-
-        ret
-MOVE ENDP
 
 
 END MAIN    
