@@ -115,7 +115,52 @@ TIME5        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X',
 TIME6        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
 
 TIME7        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
-                                  
+
+
+
+
+STATE0TEMP       DB         'G','L','W','R'  ,'G','D','W','H'  ,'G','L','W','S'  ,'G','D','W','Q'  ,'G','L','W','K'  ,'G','D','W','S' ,'G','L','W','H'  ,'G','D','W','R'
+
+STATE1TEMP       DB         'G','D','W','P'  ,'G','L','W','P'  ,'G','D','W','P'  ,'G','L','W','P'  ,'G','D','W','P'  ,'G','L','W','P' ,'G','D','W','P'  ,'G','L','W','P'
+
+STATE2TEMP       DB         'G','L','X','X'  ,'G','D','X','X'  ,'G','L','X','X'  ,'G','D','X','X'  ,'G','L','X','X'  ,'G','D','X','X' ,'G','L','X','X'  ,'G','D','X','X'
+
+STATE3TEMP       DB         'G','D','X','X'  ,'G','L','X','X'  ,'G','D','X','X'  ,'G','L','X','X'  ,'G','D','X','X'  ,'G','L','X','X' ,'G','D','X','X'  ,'G','L','X','X'
+
+STATE4TEMP        DB         'G','L','X','X'  ,'G','D','X','X'  ,'G','L','X','X'  ,'G','D','X','X'  ,'G','L','X','X'  ,'G','D','X','X' ,'G','L','X','X'  ,'G','D','X','X'
+
+STATE5TEMP       DB         'G','D','X','X'  ,'G','L','X','X'  ,'G','D','X','X'  ,'G','L','X','X'  ,'G','D','X','X'  ,'G','L','X','X' ,'G','D','X','X'  ,'G','L','X','X'
+
+STATE6TEMP       DB         'G','L','B','P'  ,'G','D','B','P'  ,'G','L','B','P'  ,'G','D','B','P'  ,'G','L','B','P'  ,'G','D','B','P' ,'G','L','B','P'  ,'G','D','B','P'
+
+STATE7TEMP      DB         'G','D','B','R'  ,'G','L','B','H'  ,'G','D','B','S'  ,'G','L','B','Q'  ,'G','D','B','K'  ,'G','L','B','S' ,'G','D','B','H'  ,'G','L','B','R'
+
+
+
+TIME0TEMP        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
+
+TIME1TEMP        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
+
+TIME2TEMP        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
+
+TIME3TEMP        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
+
+TIME4TEMP        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
+
+TIME5TEMP        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
+
+TIME6TEMP        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
+
+TIME7TEMP        DB         'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0  ,'X','X','X',0 ,'X','X','X',0  ,'X','X','X',0
+                             
+
+
+
+
+
+
+
+
 ENTERNAME  DB 'PLEASE ENTER YOUR NAME:', 13 ,10 ,'$'
 ENTERKEY  DB 'PLEASE ENTER KEY TO CONTINUE:', 13 ,10 ,'$'
 InDATA db 30,?,30 dup('$')
@@ -146,9 +191,6 @@ PLAYER_ONE_WIN:
  MOV AL,03H
  INT 10H
 
-
-
- 
  mov ah,02
  mov bh,00
  mov dl,20
@@ -285,6 +327,23 @@ JMP PRESS_ESC
 
 ;//////////////////////////////////////////////////////////////////////////////////////////////
  GAME:
+MOV BX , 0
+ LOOP_TRANSFER_STATE0:
+ MOV AL , STATE0TEMP[BX]
+ MOV STATE0[BX],AL
+ INC BX
+ CMP BX , 255
+ JNE LOOP_TRANSFER_STATE0
+
+ MOV BX , 0
+ LOOP_TRANSFER_TIME0:
+ MOV AL , TIME0TEMP[BX]
+ MOV TIME0[BX],AL
+ INC BX
+ CMP BX , 255
+ JNE LOOP_TRANSFER_TIME0
+
+
 
 MOV PLACESTORAGEX,  0  
 MOV PLACESTORAGEY  , 0 
