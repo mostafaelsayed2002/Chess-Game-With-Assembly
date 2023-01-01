@@ -56,7 +56,22 @@ CHECKPLACEY DW 0
 TEMPSHAPEF DB ?
 TEMPSHAPES DB ?
 
+VALUE db ?,'$'
+VALUEC db ?,'$'
+PlayerMSG db 'ME:','$'
+OpponentMSG db 'YOU:','$'
+LINEMSG db '------------------------------------------------------------------------------','$'
+EndMSG db 'To end chatting with     Press F3','$'
 
+XR db 0   ;;length of the opponent player
+YR db 44
+XT db 0   ;;length of the current player
+YT db 39
+
+XRC db 0   
+YRC db 0Dh
+XTC db 0  
+YTC db 1h
 
 imgFilename DB 'G1', 0
 
@@ -315,14 +330,293 @@ JJMP:
 MOV AH,00H
 INT 16h
 
-;;CMP AH,3BH
-;;MOVE TO CHATTING
+CMP AH,3BH
+je CHATING
 CMP AH,3CH
-JE GAME
+JE Station10
 
 CMP AH,01H
 JNE JJMP
 JMP PRESS_ESC
+
+
+
+
+
+
+
+
+
+CHATING:
+
+
+ mov dx,3fbh ; Line Control Register
+ mov al,10000000b ;Set Divisor Latch Access Bit
+ out dx,al ;Out it
+ ;Set LSB byte of the Baud Rate Divisor Latch register.
+ mov dx,3f8h
+ mov al,0ch
+ out dx,al
+ ;Set MSB byte of the Baud Rate Divisor Latch register.
+ mov dx,3f9h
+ mov al,00h
+ out dx,al
+ mov dx,3fbh
+ mov al,00011011b
+ out dx,al
+
+
+mov ax,0003h
+int 10h
+;;Print Usernames And Lines (Modify Players usernames on it)
+mov ah,2
+mov dx,0000h
+int 10h
+Mov dx,offset PlayerMSG
+mov ah,9
+int 21h 
+
+mov ah,2
+mov dx,0B00h
+int 10h
+
+Mov dx,offset LineMSG
+mov ah,9
+int 21h 
+
+mov ah,2
+mov dx,0C00h
+int 10h 
+
+Mov dx,offset OpponentMSG
+mov ah,9
+int 21h 
+
+mov ah,2
+mov dx,1700h
+int 10h 
+Mov dx,offset LineMSG
+mov ah,9
+int 21h 
+
+mov ah,2
+mov dx,1800h
+int 10h 
+Mov dx,offset EndMSG
+mov ah,9
+int 21h 
+
+jmp Manga10
+Station10:
+jmp GAME
+
+Manga10:
+mov ah,2
+mov dx,0100h
+int 10h
+
+Again:
+
+mov dx , 3FDH ; Line Status Register
+
+ in al , dx
+AND al,1
+JZ StationC
+mov dx ,03F8H
+in al , dx
+mov VALUEC,al
+
+;;Check If Enter
+cmp VALUEC,13
+je EnterHandlingC
+cmp XRC,80
+je NEWLINEC
+jmp CONTC
+
+NEWLINEC:
+;; Check Scroll
+cmp YRC,22
+jne CONTINUEC  ;;No Need For Scrolling
+mov YRC,13
+mov XRC,0
+mov ah,6
+mov al,10
+mov bh,7
+mov ch,13
+mov dh,22
+mov cl,0
+mov dl,79
+int 10h  
+jmp CONTC
+StationC:
+jmp SkipRecevingC
+CONTINUEC: ;;New Line
+inc YRC
+mov XRC,0
+jmp CONTC
+CONTC:   ;;Normal Logic
+mov dl,XRC
+mov ah,2
+mov bh,0
+mov dh,YRC    
+int 10h  
+inc XRC
+
+mov ah,2
+mov dl,VALUEC
+int 21h
+jmp SkipRecevingC
+EnterHandlingC:  
+cmp YRC,22
+jne NormalEnterC
+mov YRC,13
+mov XRC,0
+mov ah,6
+mov al,10
+mov bh,7
+mov ch,13
+mov dh,22
+mov cl,0
+mov dl,79
+int 10h  
+jmp SkipRecevingC
+NormalEnterC:  ;;Enter But Not In The Last Row
+inc YRC
+mov XRC,0
+SkipRecevingC:
+
+mov al,0
+mov ah,1
+int 16h 
+cmp al,0
+je Station2C
+;;Reading 
+;;cmp ah, 01h
+;;jne notescapeC
+;;jmp EscapeC
+NotescapeC:
+mov VALUEC,al
+cmp VALUEC,13
+je ENTER2C
+cmp XTC,80
+je NEWLINE2C
+jmp CONT2C
+
+NEWLINE2C:
+cmp YTC,10
+jne CONTINUE2C
+;;scrolling 
+mov YTC,1
+mov XTC,0
+mov ah,6
+mov al,10
+mov bh,7
+mov ch,1
+mov dh,10
+mov cl,0
+mov dl,79
+int 10h
+jmp CONT2C 
+Station2C:
+jmp skipReadingC
+CONTINUE2C:
+inc YTC
+mov XTC,0
+jmp CONT2C
+CONT2C:
+mov dl,XTC
+mov ah,2
+mov bh,0
+mov dh,YTC     
+int 10h  
+inc XTC
+
+
+mov ah,2
+mov dl,VALUEC
+int 21h
+jmp okC
+ENTER2C:
+cmp YTC,10
+jne NormalEnter2C
+;;scrolling 
+mov YTC,1
+mov XTC,0
+mov ah,6
+mov al,10
+mov bh,7
+mov ch,1
+mov dh,10
+mov cl,0
+mov dl,79
+int 10h
+jmp okC
+NormalEnter2C:
+inc YTC
+mov XTC,0
+okC:
+push ax
+mov ah,0
+int 16h
+pop ax
+
+;Check that Transmitter Holding Register is Empty
+mov dx , 3FDH ; Line Status Register
+ In al , dx ;Read Line Status
+AND al , 00100000b
+JZ skipReadingC
+;;Writing
+
+;If empty put the VALUE in Transmit data register
+mov dx , 3F8H ; Transmit data register
+mov al,VALUEC
+out dx , al
+
+
+
+skipReadingC:
+
+
+
+
+jmp Again
+   
+;;   مش عارف هتبقي ازاي عايز الاتنين يقفلوا بس واحد بس هو الي بيقفل
+;;   Escape:
+;;mov ax,0003h  ;; returs to text mode
+;;int 10h
+;;mov ah, 4ch
+;;int 21h 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ;//////////////////////////////////////////////////////////////////////////////////////////////
@@ -393,6 +687,42 @@ MOV CHECKPLACEY ,0
       MOV  imgFilename[0],'M'
       MOV  imgFilename[1],'O'
           MOV XSTART, 625
+
+mov ah,02
+mov bh,00
+mov dl,0
+mov dh,38
+int 10h
+  
+Mov dx,offset PlayerMSG
+mov ah,9
+int 21h 
+
+mov ah,02
+mov bh,00
+mov dl,0
+mov dh,42
+int 10h
+  
+Mov dx,offset LineMSG
+mov ah,9
+int 21h 
+
+mov ah,02
+mov bh,00
+mov dl,0
+mov dh,43
+int 10h
+
+Mov dx,offset OpponentMSG
+mov ah,9
+int 21h 
+
+mov ah,02
+mov bh,00
+mov dl,0
+mov dh,39
+int 10h
 
 
 
@@ -626,6 +956,8 @@ POP AX
 POP YSTART 
 POP XSTART 
 
+
+
 ;;==========================================================================
 ;;  THIS PART OF CODE DO 
 ;;  WAIT FOR THE KEYBOARD CLICK AND GET IT 
@@ -638,12 +970,16 @@ POP XSTART
             mov dx , 3FDH		; Line Status Register
         	in al , dx 
             AND al , 1
-            JZ CHK
+            Jnz wow
+            jmp   Station4
+wow:
 
       ;If Ready read the VALUE in Receive data register
             mov dx , 03F8H
             in al , dx 
-            mov PLACEOLD , al
+cmp al,1
+je Text
+
 
        mov dx , 3FDH		; Line Status Register
        CHK1: in al , dx 
@@ -652,15 +988,120 @@ POP XSTART
 
         mov dx , 03F8H
             in al , dx 
+            mov PLACEOLD , al
+
+                mov dx , 3FDH		; Line Status Register
+       CHK2: in al , dx 
+            AND al , 1
+            JZ CHK2
+
+        mov dx , 03F8H
+            in al , dx 
             mov PLACENEW , al
 
 
-
-
  CALL MOVE
+jmp NOtText
+;;Inline Chatting Receiving
+Text:
+
+       mov dx , 3FDH		; Line Status Register
+       CHK3: in al , dx 
+            AND al , 1
+            JZ CHK3
+        mov dx , 03F8H
+            in al , dx 
+            mov VALUE , al
+
+cmp VALUE,109
+jne wow2
+jmp EnterHandling
+wow2:
+cmp XR,75
+je NEWLINE
+jmp CONT3
+
+NEWLINE:
+;; Check Scroll
+cmp YR,46
+jne CONTINUE  ;;No Need For Scrolling
+mov YR,44
+mov XR,0
+mov imgFilename[0],'T'
+mov imgFilename[1],'T'
+push XSTART
+push YSTART
+mov XSTART,0
+mov YSTART,690
+mov MODE,1
+CALL PrintGrid
+pop YSTART
+pop XSTART
+mov ah,02
+mov bh,00
+mov dl,0
+mov dh,43
+int 10h
+Mov dx,offset OpponentMSG
+mov ah,9
+int 21h  
+jmp CONT3
+CONTINUE: ;;New Line
+inc YR
+mov XR,0
+jmp CONT3
+Station4:
+jmp CHK
+
+CONT3:   ;;Normal Logic
+mov dl,XR
+mov ah,2
+mov bh,0
+mov dh,YR     
+int 10h  
+inc XR
+mov ah,2
+mov dl,VALUE
+int 21h
+jmp NOtText  
+EnterHandling:  
+cmp YR,46
+jne NormalEnter
+mov YR,44
+mov XR,0
+mov imgFilename[0],'T'
+mov imgFilename[1],'T'
+push XSTART
+push YSTART
+mov XSTART,0
+mov YSTART,690
+mov MODE,1
+CALL PrintGrid
+pop YSTART
+pop XSTART
+mov ah,02
+mov bh,00
+mov dl,0
+mov dh,43
+int 10h
+
+Mov dx,offset OpponentMSG
+mov ah,9
+int 21h   
+jmp NOtText
+NormalEnter:  ;;Enter But Not In The Last Row
+inc YR
+mov XR,0
+
+
+ 
+
+
+
+
 ;////////////////////////////////////////////////////
         
-       
+ NOtText:      
  
 
 
@@ -670,10 +1111,10 @@ POP XSTART
 ;//////////////////////////////////////////////////////
 
       CHK:
-    MOV AH,01
+    MOV AH,01  ;; if something enteresd
     INT 16H
-    JZ CheckKeyPressed ;NO DATA IS ENTERED
-    MOV AH,0
+    JZ Station5 ;NO DATA IS ENTERED
+    MOV AH,0  ;; clear buffer
     INT 16H                                    ;;SEND
      
 
@@ -711,8 +1152,126 @@ POP XSTART
         jne not_esc
         jmp PRESS_ESC
         not_esc:
+
+
+mov VALUE,al
+
+cmp VALUE,109
+jne wow3
+jmp ENTER2
+wow3:
+cmp XT,75
+je NEWLINE2
+jmp CONT2
+ Station5:
+       jmp CheckKeyPressed
+
+NEWLINE2:
+cmp YT,41
+jne CONTINUE2
+mov imgFilename[0],'T'
+mov imgFilename[1],'T'
+push XSTART
+push YSTART
+mov XSTART,0
+mov YSTART,600
+mov MODE,1
+CALL PrintGrid
+pop YSTART
+pop XSTART
+;;scrolling 
+mov YT,39
+mov XT,0
+mov ah,02
+mov bh,00
+mov dl,0
+mov dh,38
+int 10h
+Mov dx,offset PlayerMSG
+mov ah,9
+int 21h 
+jmp CONT2  
+CONTINUE2:
+inc YT
+mov XT,0
+jmp CONT2
+ 
+CONT2:
+mov dl,XT
+mov ah,2
+mov bh,0
+mov dh,YT     
+int 10h  
+inc XT
+
+
+mov ah,2
+mov dl,VALUE
+int 21h
+jmp ok2
+ENTER2:
+cmp YT,41
+jne NormalEnter2
+mov imgFilename[0],'T'
+mov imgFilename[1],'T'
+push XSTART
+push YSTART
+mov XSTART,0
+mov YSTART,600
+mov MODE,1
+CALL PrintGrid
+pop YSTART
+pop XSTART
+;;scrolling 
+mov YT,39
+mov XT,0
+mov ah,02
+mov bh,00
+mov dl,0
+mov dh,38
+int 10h
+Mov dx,offset PlayerMSG
+mov ah,9
+int 21h 
+jmp ok2
+      Station6:
+       jmp not_esc
+NormalEnter2:
+inc YT
+mov XT,0
+
+ok2:
+
+;;;Inline Chatting Transmitting
+            mov dx , 3FDH		
+            In al , dx 			
+            AND al , 00100000b
+            JZ skipReading
+
+   
+            mov dx , 3F8H		
+            mov al,1
+            out dx , al 
+  
+            mov dx , 3FDH		
+    AGAINSEND3:  
+            In al , dx 			
+            AND al , 00100000b
+            JZ AGAINSEND3
+        mov dx , 3F8H 
+        mov al,VALUE
+        out dx , al
+
+
+
+
+
+skipReading:
+
+
         
         JMP CheckKeyPressed
+        
 
 	
 ;;==========================================================================
@@ -723,7 +1282,7 @@ POP XSTART
         MOV BX,YSTART
         SUB BX,75 
         CMP BX,0
-        JL not_esc
+        JL Station6
         CALL PrintInState          ;removing the highlight from current cell
         MOV  imgFilename[0],'F' 
         MOV  imgFilename[1],'R'
@@ -2505,8 +3064,24 @@ NOT_KING:
 
     ;If empty put the VALUE in Transmit data register
             mov dx , 3F8H		; Transmit data register
+            mov al,0
+            out dx , al 
+
+
+       mov dx , 3FDH		; Line Status Register
+    AGAINSEND4:  
+            In al , dx 			;Read Line Status
+            AND al , 00100000b
+            JZ AGAINSEND4
+
+    ;If empty put the VALUE in Transmit data register
+            mov dx , 3F8H		; Transmit data register
             mov al,PLACEOLD
             out dx , al 
+
+
+
+
     ;Check that Transmitter Holding Register is Empty
             mov dx , 3FDH		; Line Status Register
     AGAINSEND1:  
@@ -3515,6 +4090,7 @@ POP XSTART
 CALL CHECKKING
         ret
 MOVE ENDP
+
 
 
 END MAIN    
