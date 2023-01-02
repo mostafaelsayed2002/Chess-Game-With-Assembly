@@ -56,6 +56,23 @@ CHECKPLACEY DW 0
 TEMPSHAPEF DB ?
 TEMPSHAPES DB ?
 
+DATAF2 DB 0
+
+;;--------new-------------
+ LOOPX DW 0 
+ LOOPY DW 0 
+
+MSG_TIME DB "TIME :",'$'
+PRINT_SECONDS_RIGHT DB 0 
+PRINT_SECONDS_LEFT DB 0
+
+PRINT_MIN_RIGHT DB 0 
+PRINT_MIN_LEFT DB 0
+
+REAL_SECONDS DB 0
+REAL_MIN  DB 0 
+;;---------------------
+
 
 VALUE db ?,'$'
 VALUEC db ?,'$'
@@ -326,7 +343,66 @@ MOV DX,OFFSET ENTERESC
 MOV AH,9
 INT 21h
 
+
+
+                            ; JE Station10   ;;GO TO THE GAME 
+
 JJMP:
+ ;;=====================RECIVE F2??==============
+
+            mov dx , 3FDH		; Line Status Register
+            in al , dx 
+            AND al , 1
+            JZ NODATARECIVED
+
+            mov dx , 03F8H
+            in al , dx 
+            mov DATAF2 , al
+     
+     
+          mov ah,02
+          mov bh,00
+          mov dl,22
+          mov dh,17
+          int 10h
+          
+          MOV AL,DATAF2
+          MOV AH,0EH
+          INT 10h
+
+
+
+   JMP JJMP
+
+ ;;==========================================
+NODATARECIVED:
+
+MOV AH,00H
+INT 16h        ;;TAKE KEY IF F3 GO TO CHAT IF IF F2 .....
+
+CMP AH,3BH   ;; F3
+je CHATING
+
+
+CMP AH,3CH    ;;F2 
+           mov dx , 3FDH		
+    AGAINSEND300:  
+            In al , dx 			
+            AND al , 00100000b
+            JZ AGAINSEND300
+        mov dx , 3F8H 
+        mov al,'A'
+        out dx , al
+
+
+CMP AH,01H
+JNE JJMP
+
+
+
+
+
+
 MOV AH,00H
 INT 16h
 
@@ -2425,7 +2501,9 @@ sub ax,XNEW
 mov bx,YOLD
 sub bx,YNEW
 cmp ax,bx
-jz  STATIONTOcheckmove4
+JNZ JSKDLAF
+jMP  STATIONTOcheckmove4
+JSKDLAF:
 jmp Invalid
 ; -----------------------------------------
 Invalid:

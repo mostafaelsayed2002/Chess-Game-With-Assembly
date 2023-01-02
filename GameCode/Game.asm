@@ -56,7 +56,7 @@ CHECKPLACEY DW 0
 TEMPSHAPEF DB ?
 TEMPSHAPES DB ?
 
-
+DATAF2 DB 0
 ;;--------new-------------
  LOOPX DW 0 
 LOOPY DW 0 
@@ -262,25 +262,25 @@ INT 21h
 MOV AH,00
 INT 16H
 
-
+;;;=================start of options page==========================
 GO_TO:
 
 
   mov ax,0600h
   mov bh,07
   mov cx,0
-  mov dx,184fh
+  mov dx,184fh                ;; clear the screen 
   int 10h
 
 mov ah,02
 mov bh,00
-mov dl,0
+mov dl,0           ;move cursor 
 mov dh,0
 int 10h
 
 
 MOV DX,OFFSET ENTERNAME
-MOV AH,9
+MOV AH,9                                  ;;print some messages
 INT 21h
 
 mov ah,02
@@ -346,27 +346,67 @@ MOV DX,OFFSET ENTERESC
 MOV AH,9
 INT 21h
 
-JJMP:
-MOV AH,00H
-INT 16h
 
-CMP AH,3BH
+                            ; JE Station10   ;;GO TO THE GAME 
+
+JJMP:
+ ;;=====================RECIVE F2??==============
+
+            mov dx , 3FDH		; Line Status Register
+            in al , dx 
+            AND al , 1
+            JZ NODATARECIVED
+
+            mov dx , 03F8H
+            in al , dx 
+            mov DATAF2 , al
+     
+     
+          mov ah,02
+          mov bh,00
+          mov dl,22
+          mov dh,17
+          int 10h
+          
+          MOV AL,DATAF2
+          MOV AH,0EH
+          INT 10h
+
+
+
+   JMP JJMP
+
+ ;;==========================================
+NODATARECIVED:
+
+MOV AH,00H
+INT 16h        ;;TAKE KEY IF F3 GO TO CHAT IF IF F2 .....
+
+CMP AH,3BH   ;; F3
 je CHATING
-CMP AH,3CH
-JE Station10
+
+
+CMP AH,3CH    ;;F2 
+           mov dx , 3FDH		
+    AGAINSEND300:  
+            In al , dx 			
+            AND al , 00100000b
+            JZ AGAINSEND300
+        mov dx , 3F8H 
+        mov al,'A'
+        out dx , al
+
 
 CMP AH,01H
 JNE JJMP
+
+
+
+
+
+
+
 JMP PRESS_ESC
-
-
-
-
-
-
-
-
-
 CHATING:
 
 
