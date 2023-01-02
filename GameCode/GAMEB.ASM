@@ -898,8 +898,8 @@ MOV AL , AH
 MOV BL,75
 MUL BL 
 MOV XSTART , AX
-MOV imgFilename[0],'H'
-MOV imgFilename[1],'H'
+MOV imgFilename[0],'Z'
+MOV imgFilename[1],'Z'
 MOV MODE,1
 CALL PRINT
 
@@ -910,8 +910,8 @@ MUL BL
 MOV RANDOMPLACE,AX 
 
  MOV BX , RANDOMPLACE
- MOV STATE0[BX+2],'H'
- MOV STATE0[BX+3],'H'
+ MOV STATE0[BX+2],'Z'
+ MOV STATE0[BX+3],'Z'
 
 
 POP BX 
@@ -926,6 +926,111 @@ POP XSTART
 	CheckKeyPressed:
       
       
+
+
+		MOV AH,2ch ;11:39:00
+INT 21h  
+MOV REAL_SECONDS,DH
+
+   ;;=========================================================================
+
+
+;;-------------------------------NEW SASA-----------------------------------
+
+;;//////////////////////PRINT AND UPDATE TIME OF GAME////////////////////////////////
+MOV DL ,80 ;COLUMN
+MOV DH,39 ;ROW
+MOV BH,0  ;PAGE
+MOV AH ,02H ;SET CURSOR
+INT 10H
+
+MOV DX , OFFSET MSG_TIME
+MOV AH , 9 
+INT 21H 
+
+MOV AH,2ch ;11:39:00
+INT 21h                               ; CH         Hours (BCD)
+                                      ; CL         Minutes (BCD)
+                                       ; DH         Seconds (BCD)
+;;/////////////////////Min///////////////////////////////
+MOV AL , PRINT_MIN_LEFT  ;PRINT LEFT_DIGIT OF MIN
+ADD AL , 48
+MOV BL , 0CH ;COLOR RED 
+MOV BH,0
+MOV AH,0EH
+INT 10h 
+
+
+MOV AL , PRINT_MIN_RIGHT   ;PRINT LEFT_DIGIT OF MIN
+ADD AL , 48
+MOV BL , 0CH ;COLOR RED 
+MOV BH,0
+MOV AH,0EH
+INT 10h 
+
+MOV AL , ':'  
+MOV BL , 0FH ;COLOR RED 
+MOV BH,0
+MOV AH,0EH
+INT 10h 
+
+
+;;//////////////////////////Seconds//////////////////////////
+MOV AL , PRINT_SECONDS_LEFT  ;PRINT LEFT_DIGIT OF SEC
+ADD AL , 48
+MOV BL , 0CH ;COLOR RED 
+MOV BH,0
+MOV AH,0EH
+INT 10h 
+
+CMP DH , REAL_SECONDS
+JE IN_SAME_SEC
+CMP PRINT_SECONDS_RIGHT,9
+JNE NOT_IN_LAST9
+CMP PRINT_SECONDS_LEFT,5
+JNE IN_9_NOT_IN_59
+;;INC MIN -----------------
+MOV PRINT_SECONDS_RIGHT,0
+MOV PRINT_SECONDS_LEFT,0
+CMP PRINT_MIN_LEFT,9
+JNE NOT_9_MIN
+NOT_9_MIN:
+INC PRINT_MIN_RIGHT
+;;----------------
+JMP EXIT_SECONDS
+
+IN_9_NOT_IN_59:
+INC PRINT_SECONDS_LEFT
+MOV PRINT_SECONDS_RIGHT,0
+JMP EXIT_SECONDS
+
+NOT_IN_LAST9:
+INC PRINT_SECONDS_RIGHT
+
+EXIT_SECONDS:
+MOV AL , PRINT_SECONDS_RIGHT   ;PRINT LEFT_DIGIT OF SEC
+ADD AL , 48
+MOV BL , 0CH ;COLOR RED 
+MOV BH,0
+MOV AH,0EH
+INT 10h 
+MOV REAL_SECONDS,DH
+IN_SAME_SEC:
+
+
+
+
+
+   ;;=========================================================================   
+
+
+
+
+
+
+
+
+
 
        ;Check that Data Ready
             mov dx , 3FDH		; Line Status Register
@@ -1396,6 +1501,8 @@ FIRSTMOVE_OR_MORE_THAN_3SEC:
       ;; AND STORE  IT IN  "SHAPESTORAGE"      
        MOV AL,STATE0[BX+2]
        CMP AL,'X'          ;;THIS CHECK IF IT IS EMPY CELL AND PLAYER WANT TO MOVE It WHICH IS FORBIEDDEN                                                  
+       JE BRIDGE_TO_here 
+        CMP AL,'Z'          ;;THIS CHECK IF IT IS EMPY CELL AND PLAYER WANT TO MOVE It WHICH IS FORBIEDDEN                                                  
        JE BRIDGE_TO_here 
        CMP AL,'W'
        JE BRIDGE_TO_here 
@@ -2341,8 +2448,13 @@ CALL GETPLACE
 MOV BX,PLACE
 MOV Al,STATE0[BX+2]
 CMP AL,'X'
+JNE MANGEELSAYED
+JMP checkmove1
+MANGEELSAYED:
+CMP AL,'Z'
 JNE FORINVAILDBISHOP
 JMP checkmove1
+
 
         JMP FORBISHOP
         STATIONTOcheckmove3:   
@@ -2366,8 +2478,14 @@ checkmove2:
  MOV BX,PLACE
  MOV Al,STATE0[BX+2]
  CMP AL,'X'
+ JNE SASAHANY
+ JMP checkmove2 
+ SASAHANY:
+CMP AL,'Z'
  JNE STATIONTOHHERE0
  JMP checkmove2 
+
+
 
 TABEA12:
 JMP TABEA
@@ -2393,6 +2511,10 @@ FORVAILDBISHOP:
  MOV Al,STATE0[BX+2]
  CMP AL,'X'
 FORINVAILDBISHOP:
+ JNE HELLOITSME
+ JMP checkmove3
+  HELLOITSME:
+ CMP AL,'Z'
  JNE STATIONTOHHERE0
  JMP checkmove3
 
@@ -2410,6 +2532,10 @@ FORINVAILDBISHOP:
  MOV BX,PLACE
  MOV Al,STATE0[BX+2]
  CMP AL,'X'
+ JNE MAGE
+ JMP checkmove4
+ MAGE:
+ CMP AL,'Z'
  JNE STATIONTOHHERE0
  JMP checkmove4
 ;=========================================================================================
@@ -2769,6 +2895,8 @@ mov BX,PLACE
 MOV AL ,state0[BX+2];MOVEB odam
 cmp AL,'X'
 je CODE2
+cmp AL,'Z'
+je CODE2
 CMP AL ,'H'
 JE CODE2
 JMP TOHHERE2 
@@ -2827,6 +2955,8 @@ call GETPLACE
 mov BX,PLACE
 MOV AL ,state0[BX+2]
 cmp AL,'X'
+je CODE1
+cmp AL,'Z'
 je CODE1
 cmp AL,'H'
 je CODE1
